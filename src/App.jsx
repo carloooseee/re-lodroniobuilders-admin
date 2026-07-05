@@ -118,6 +118,22 @@ function App() {
     }
   };
 
+  const handleReplyEmail = () => {
+    if (!selectedMessage) return;
+    
+    const recipient = selectedMessage.email;
+    const subject = encodeURIComponent(`Re: ${selectedMessage.subject || 'Inquiry'}`);
+    
+    const dateStr = selectedMessage.createdAt 
+      ? new Date(selectedMessage.createdAt.seconds ? selectedMessage.createdAt.seconds * 1000 : (typeof selectedMessage.createdAt === 'string' ? selectedMessage.createdAt : selectedMessage.createdAt)).toLocaleString()
+      : 'N/A';
+
+    const bodyTemplate = `Hi ${selectedMessage.name ? selectedMessage.name.split(' ')[0] : 'there'},\n\n\n\n---\nOriginal Message:\nFrom: ${selectedMessage.name || ''} <${selectedMessage.email || ''}>\nDate: ${dateStr}\nSubject: ${selectedMessage.subject || ''}\n\n${selectedMessage.message || ''}`;
+    
+    const body = encodeURIComponent(bodyTemplate);
+    window.location.href = `mailto:${recipient}?subject=${subject}&body=${body}`;
+  };
+
   const filteredMessages = messages.filter(msg => {
     if (statusFilter === 'all') return true;
     const status = msg.status || 'new';
@@ -464,7 +480,10 @@ function App() {
                     </div>
                   )}
                   <div className="p-6 border-t border-outline-variant bg-surface flex gap-4 w-full">
-                     <button className="flex-1 bg-primary text-white py-3 text-xs font-bold tracking-widest uppercase hover:bg-opacity-90 transition-colors">
+                     <button 
+                       onClick={handleReplyEmail}
+                       className="flex-1 bg-primary text-white py-3 text-xs font-bold tracking-widest uppercase hover:bg-opacity-90 transition-colors"
+                     >
                        Reply to {selectedMessage.name ? selectedMessage.name.split(' ')[0] : 'Sender'}
                      </button>
                      <select 
