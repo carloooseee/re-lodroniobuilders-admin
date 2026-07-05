@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sign Up - RE Lodronio Builders Inc.</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Bodoni Moda -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400..900;1,400..900&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'surface': '#fbf9f8',
+            'surface-dim': '#dbd9d9',
+            'surface-bright': '#fbf9f8',
+            'outline-variant': '#e0e0e0',
+            'primary': '#121212',
+            'on-surface-variant': '#757575',
+          },
+          fontFamily: {
+            'bodoni': ['"Bodoni Moda"', 'serif'],
+          },
+          spacing: {
+            'margin-desktop': '4rem',
+            'container-max': '1440px',
+            'section-gap': '2rem',
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="typography">
+    body {
+      font-family: 'Bodoni Moda', serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    h1, h2, h3, .brand-logo {
+      font-weight: 400;
+    }
+    label {
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+      display: block;
+    }
+  </style>
+<style data-purpose="layout">
+    .form-card {
+      max-width: 520px;
+      width: 100%;
+      background-color: #f2f0ee; /* Slightly darker than surface for contrast as seen in image */
+      border: 1px solid #d1d1d1;
+      padding: 3rem 2.5rem;
+    }
+    .input-field {
+      width: 100%;
+      border: 1px solid #d1d1d1;
+      padding: 0.75rem;
+      background-color: #ffffff;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .input-field:focus {
+      border-color: #121212;
+      ring: 0;
+    }
+    .select-field {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1rem;
+    }
+  </style>
+</head>
+<body class="bg-surface text-primary min-h-screen flex flex-col">
+<!-- BEGIN: MainHeader -->
+<header class="w-full border-b border-outline-variant bg-surface" data-purpose="top-navigation">
+<div class="flex justify-between items-center h-24 px-margin-desktop max-w-container-max mx-auto">
+<div class="brand-logo text-3xl tracking-tight cursor-pointer">
+        RE Lodronio Builders Inc.
+      </div>
+<!-- Empty space for nav if needed later, matches visual weight of empty right side in ref -->
+</div>
+</header>
+<!-- END: MainHeader -->
+<!-- BEGIN: MainContent -->
+<main class="flex-grow flex items-center justify-center py-20 px-4">
+<!-- BEGIN: SignUpCard -->
+<section class="form-card" data-purpose="signup-form-container">
+<header class="mb-10">
+<h1 class="text-5xl mb-2">Sign up</h1>
+<p class="text-on-surface-variant text-lg">Fill in details</p>
+</header>
+<form action="#" class="space-y-6" method="POST">
+<!-- Row for First & Last Name -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div>
+<label for="first-name">First Name</label>
+<input class="input-field" id="first-name" name="first-name" required="" type="text"/>
+</div>
+<div>
+<label for="last-name">Last Name</label>
+<input class="input-field" id="last-name" name="last-name" required="" type="text"/>
+</div>
+</div>
+<!-- Email address -->
+<div>
+<label for="email">Email address</label>
+<input class="input-field" id="email" name="email" required="" type="email"/>
+</div>
+<!-- Password -->
+<div>
+<label for="password">Password</label>
+<input class="input-field" id="password" name="password" required="" type="password"/>
+</div>
+<!-- Role Dropdown -->
+<div>
+<label for="role">Role</label>
+<select class="input-field select-field" id="role" name="role">
+<option disabled="" selected="" value=""></option>
+<option value="admin">Administrator</option>
+<option value="manager">Project Manager</option>
+<option value="staff">Staff</option>
+</select>
+</div>
+<!-- Department Dropdown -->
+<div>
+<label for="department">Department</label>
+<select class="input-field select-field" id="department" name="department">
+<option value="hr">Human Resources</option>
+<option value="finance">Finance</option>
+<option value="operations">Operations</option>
+<option value="engineering">Engineering</option>
+</select>
+</div>
+<!-- Submit Button -->
+<div class="pt-4">
+<button class="w-full bg-primary text-white py-4 text-lg hover:bg-opacity-90 transition-opacity uppercase tracking-widest font-light" type="submit">
+            Sign up
+          </button>
+</div>
+</form>
+</section>
+<!-- END: SignUpCard -->
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: Footer -->
+<footer class="w-full border-t border-outline-variant bg-surface" data-purpose="page-footer">
+<div class="flex flex-col md:flex-row justify-between items-center py-10 px-margin-desktop max-w-container-max mx-auto gap-8">
+<div class="brand-logo text-xl">RE Lodronio Builders Inc.</div>
+<div class="flex gap-8 text-on-surface-variant text-sm">
+<a class="hover:text-primary transition-colors" href="#">Home</a>
+<a class="hover:text-primary transition-colors" href="#">About Us</a>
+<a class="hover:text-primary transition-colors" href="#">Contact</a>
+<a class="hover:text-primary transition-colors" href="#">Policy</a>
+</div>
+<div class="text-on-surface-variant text-xs italic">
+        © 2024 RE Lodronio Builders Inc. Building with purpose.
+      </div>
+</div>
+</footer>
+<!-- END: Footer -->
+</body></html>

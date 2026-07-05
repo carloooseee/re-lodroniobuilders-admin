@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RE Lodronio Builders Inc. - Admin Inbox</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Bodoni Moda for elegant serif headlines -->
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Bodoni Moda"', 'serif'],
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              gray: '#F5F5F5',
+              dark: '#1A1A1A',
+              accent: '#808080',
+              border: '#E5E5E5',
+              'status-new': '#000000',
+              'status-progress': '#FFA500',
+              'status-resolved': '#4CAF50',
+            }
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-typography">
+    body {
+      font-family: 'Inter', sans-serif;
+      color: #1A1A1A;
+    }
+    .serif-title {
+      font-family: 'Bodoni Moda', serif;
+    }
+    .text-xxs {
+      font-size: 0.65rem;
+    }
+  </style>
+<style data-purpose="layout-tweaks">
+    .ticket-list::-webkit-scrollbar {
+      width: 4px;
+    }
+    .ticket-list::-webkit-scrollbar-thumb {
+      background: #E5E5E5;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body class="bg-white min-h-screen flex flex-col">
+<!-- BEGIN: MainHeader -->
+<header class="border-b border-brand-border py-6 px-12 flex justify-between items-center bg-white sticky top-0 z-50">
+<div class="flex items-center gap-4" data-purpose="logo-container">
+<div class="w-10 h-10 bg-black flex items-center justify-center rounded-sm">
+<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div>
+<h1 class="text-xl font-medium tracking-tight serif-title leading-none">RE Lodronio Builders Inc.</h1>
+<p class="text-[10px] tracking-[0.2em] text-gray-500 mt-1 uppercase">Admin • Inbox</p>
+</div>
+</div>
+<nav class="flex items-center gap-12" data-purpose="navigation">
+<div class="flex gap-8 text-[11px] font-semibold tracking-widest uppercase">
+<a class="text-black border-b border-black pb-1" href="#">Messages</a>
+<a class="text-gray-400 hover:text-black transition-colors" href="#">Settings</a>
+</div>
+<div class="flex items-center gap-6 border-l border-brand-border pl-8">
+<div class="text-right">
+<p class="text-[11px] font-bold">Arch. Roco E. Lodronio</p>
+<p class="text-[9px] text-gray-400 tracking-widest uppercase">President</p>
+</div>
+<div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-xs font-bold">RL</div>
+<button class="flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase ml-4">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Sign Out
+        </button>
+</div>
+</nav>
+</header>
+<!-- END: MainHeader -->
+<main class="flex-grow px-12 pt-12 pb-24">
+<!-- BEGIN: InboxHero -->
+<div class="mb-16">
+<p class="text-[11px] tracking-[0.3em] text-gray-400 uppercase mb-4">(Inbox)</p>
+<div class="flex justify-between items-end">
+<div class="max-w-md">
+<h2 class="text-7xl serif-title leading-tight">Incoming<br/><span class="italic">conversations.</span></h2>
+<p class="mt-8 text-sm text-gray-500 leading-relaxed">
+            Every message submitted from the contact form arrives here as a ticket. Review, reply, and update its status.
+          </p>
+</div>
+<!-- BEGIN: StatsGrid -->
+<div class="flex gap-16 pr-12">
+<div class="text-center">
+<div class="flex items-center justify-center gap-2 text-[10px] font-bold tracking-widest uppercase mb-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+              New
+            </div>
+<span class="text-5xl serif-title">2</span>
+</div>
+<div class="text-center">
+<div class="flex items-center justify-center gap-2 text-[10px] font-bold tracking-widest uppercase mb-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+              In Progress
+            </div>
+<span class="text-5xl serif-title">2</span>
+</div>
+<div class="text-center">
+<div class="flex items-center justify-center gap-2 text-[10px] font-bold tracking-widest uppercase mb-2">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+              Resolved
+            </div>
+<span class="text-5xl serif-title">1</span>
+</div>
+</div>
+<!-- END: StatsGrid -->
+</div>
+</div>
+<!-- END: InboxHero -->
+<hr class="border-brand-border mb-8"/>
+<!-- BEGIN: MainContentGrid -->
+<div class="grid grid-cols-12 gap-8">
+<!-- BEGIN: LeftColumn (TicketList) -->
+<div class="col-span-5" data-purpose="ticket-navigation">
+<div class="flex gap-6 text-[10px] font-bold tracking-widest uppercase mb-8">
+<button class="border-b-2 border-black pb-1">All <span class="text-gray-400 ml-1">(5)</span></button>
+<button class="text-gray-400 hover:text-black">New <span class="ml-1">(2)</span></button>
+<button class="text-gray-400 hover:text-black">In progress <span class="ml-1">(2)</span></button>
+<button class="text-gray-400 hover:text-black">Resolved <span class="ml-1">(2)</span></button>
+</div>
+<div class="border border-brand-border rounded-sm overflow-hidden bg-white">
+<div class="bg-gray-50 border-b border-brand-border px-4 py-3">
+<p class="text-[9px] font-bold tracking-[0.2em] text-gray-400 uppercase">5 Messages</p>
+</div>
+<!-- Ticket Card: New -->
+<div class="p-6 border-b border-brand-border hover:bg-gray-50 cursor-pointer transition-colors">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-mono text-gray-400">RLB-2026-0814</span>
+<span class="flex items-center gap-2 text-[10px] font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-black"></span> New
+              </span>
+</div>
+<div class="flex justify-between items-baseline mb-3">
+<h4 class="text-lg font-semibold">Maria Santos</h4>
+<span class="text-[9px] text-gray-400 uppercase">Jul 4, 9:12 AM</span>
+</div>
+<p class="text-[11px] text-gray-500 leading-relaxed line-clamp-2">
+              Site visit for two-storey residence — Good day. We are planning to build a two-storey residence in Santos Village Phase 3 and would like to request ...
+            </p>
+</div>
+<!-- Ticket Card: In Progress -->
+<div class="p-6 border-b border-brand-border hover:bg-gray-50 cursor-pointer transition-colors bg-white">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-mono text-gray-400">RLB-2026-0183</span>
+<span class="flex items-center gap-2 text-[10px] font-bold text-orange-400">
+<span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span> In progress
+              </span>
+</div>
+<div class="flex justify-between items-baseline mb-3">
+<h4 class="text-lg font-semibold">Jorge Villanueva</h4>
+<span class="text-[9px] text-gray-400 uppercase">Jul 4, 4:44 PM</span>
+</div>
+<p class="text-[11px] text-gray-500 leading-relaxed line-clamp-2">
+              Renovation of ancestral home — Hi, we're interested in restoring an ancestral home in Las Piñas. Can we schedule a consultation to discuss..
+            </p>
+</div>
+<!-- Ticket Card: New 2 -->
+<div class="p-6 border-b border-brand-border hover:bg-gray-50 cursor-pointer transition-colors">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-mono text-gray-400">RLB-2026-0182</span>
+<span class="flex items-center gap-2 text-[10px] font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-black"></span> New
+              </span>
+</div>
+<div class="flex justify-between items-baseline mb-3">
+<h4 class="text-lg font-semibold">Anna Reyes</h4>
+<span class="text-[9px] text-gray-400 uppercase">Jul 2, 10:08 AM</span>
+</div>
+<p class="text-[11px] text-gray-500 leading-relaxed line-clamp-2">
+              Requesting a quotation for a 90 sqm condo unit fit-out in BGC. Turnover is in September. Please advise on lead time and payment terms.
+            </p>
+</div>
+<!-- Ticket Card: Resolved -->
+<div class="p-6 border-b border-brand-border hover:bg-gray-50 cursor-pointer transition-colors">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-mono text-gray-400">RLB-2026-0181</span>
+<span class="flex items-center gap-2 text-[10px] font-bold text-green-600">
+<span class="w-1.5 h-1.5 rounded-full bg-green-600"></span> Resolved
+              </span>
+</div>
+<div class="flex justify-between items-baseline mb-3">
+<h4 class="text-lg font-semibold">Miguel Cruz</h4>
+<span class="text-[9px] text-gray-400 uppercase">Jun 30, 2:22 PM</span>
+</div>
+<p class="text-[11px] text-gray-500 leading-relaxed line-clamp-2">
+              Collaboration inquiry — Our studio would like to explore a partnership for an upcoming commercial project in Alabang. When would be a good time to...
+            </p>
+</div>
+<!-- Ticket Card: In Progress 2 (Active/Selected look) -->
+<div class="p-6 hover:bg-gray-50 cursor-pointer transition-colors">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-mono text-gray-400">RLB-2026-0180</span>
+<span class="flex items-center gap-2 text-[10px] font-bold text-orange-400">
+<span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span> In progress
+              </span>
+</div>
+<div class="flex justify-between items-baseline mb-3">
+<h4 class="text-lg font-semibold">Patricia Lim</h4>
+<span class="text-[9px] text-gray-400 uppercase">Jun 28, 8:55 AM</span>
+</div>
+<p class="text-[11px] text-gray-500 leading-relaxed line-clamp-2">
+              Following up on the punch-list items from our turnover last May. A few items remain, mainly on the kitchen cabinetry and the guest bath.
+            </p>
+</div>
+</div>
+</div>
+<!-- END: LeftColumn -->
+<!-- BEGIN: RightColumn (Message Detail) -->
+<div class="col-span-7" data-purpose="message-viewer">
+<div class="border border-brand-border rounded-sm bg-gray-50 h-full flex flex-col">
+<!-- Detail Header -->
+<div class="px-8 py-4 border-b border-brand-border flex justify-between items-center bg-white">
+<span class="text-[10px] font-mono text-gray-400 uppercase">Ticket <span class="ml-2">RLB-2026-0180</span></span>
+<span class="flex items-center gap-2 text-[10px] font-bold text-orange-400 uppercase">
+<span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span> In progress
+            </span>
+</div>
+<!-- Metadata Section -->
+<div class="bg-white px-8 py-10 border-b border-brand-border">
+<div class="grid grid-cols-2 gap-y-8">
+<div>
+<h3 class="text-xl font-bold mb-1">Miguel Cruz</h3>
+<a class="text-sm font-semibold underline decoration-1 underline-offset-4" href="mailto:m.cruz@studio-cruz.co">m.cruz@studio-cruz.co</a>
+</div>
+<div class="text-left">
+<p class="text-[9px] font-bold tracking-[0.2em] text-gray-400 uppercase mb-2">Received</p>
+<p class="text-lg font-semibold">Jun 30, 2:22 PM</p>
+</div>
+<div class="col-span-2">
+<p class="text-lg font-semibold">Collaboration Inquiry</p>
+</div>
+</div>
+</div>
+<!-- Message Body -->
+<div class="flex-grow p-8 bg-white">
+<p class="text-[9px] font-bold tracking-[0.2em] text-gray-400 uppercase mb-6">Message</p>
+<p class="text-base text-gray-800 leading-relaxed max-w-2xl">
+              Our studio would like to explore a partnership for an upcoming commercial project in Alabang. When would be a good time to meet?
+            </p>
+</div>
+<!-- Actions Footer -->
+<div class="p-6 bg-gray-50 border-t border-brand-border flex justify-between">
+<div class="flex gap-2">
+<button class="px-6 py-2.5 border border-brand-border bg-white text-[10px] font-bold tracking-widest uppercase hover:bg-gray-50 transition-colors">Mark New</button>
+<button class="px-6 py-2.5 border border-brand-border bg-white text-[10px] font-bold tracking-widest uppercase hover:bg-gray-50 transition-colors">In Progress</button>
+<button class="px-8 py-2.5 bg-black text-white text-[10px] font-bold tracking-widest uppercase hover:bg-gray-800 transition-colors">Resolve</button>
+</div>
+<div class="flex gap-2">
+<button class="px-8 py-2.5 bg-black text-white text-[10px] font-bold tracking-widest uppercase flex items-center gap-2 hover:bg-gray-800 transition-colors">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                Reply
+              </button>
+<button class="px-6 py-2.5 border border-brand-border bg-white text-[10px] font-bold tracking-widest uppercase flex items-center gap-2 hover:bg-gray-50 transition-colors">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                Archive
+              </button>
+</div>
+</div>
+</div>
+</div>
+<!-- END: RightColumn -->
+</div>
+<!-- END: MainContentGrid -->
+</main>
+<!-- BEGIN: SiteFooter -->
+<footer class="border-t border-brand-border px-12 py-10 flex justify-between items-center text-[11px] font-bold tracking-widest uppercase">
+<p>© 2026 RE Lodronio Builders Inc</p>
+<p>Building with purpose, since 2008</p>
+</footer>
+<!-- END: SiteFooter -->
+</body></html>
