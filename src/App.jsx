@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { auth, db } from './firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
-import { doc, setDoc, getDoc, collection, query, onSnapshot, orderBy } from 'firebase/firestore';
+import { doc, setDoc, getDoc, collection, query, onSnapshot, orderBy, updateDoc } from 'firebase/firestore';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -11,6 +11,8 @@ function App() {
   const [authMode, setAuthMode] = useState('login'); // 'login' or 'signup'
   const [messages, setMessages] = useState([]);
   const [selectedMessage, setSelectedMessage] = useState(null);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [updateError, setUpdateError] = useState('');
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -106,13 +108,21 @@ function App() {
 
   const handleUpdateStatus = async (status) => {
     if (!selectedMessage) return;
+    setUpdateError('');
     try {
-      await setDoc(doc(db, 'messages', selectedMessage.id), { status }, { merge: true });
+      await updateDoc(doc(db, 'messages', selectedMessage.id), { status });
       setSelectedMessage(prev => ({ ...prev, status }));
     } catch (err) {
       console.error("Error updating status:", err);
+      setUpdateError(err.message || 'Failed to update status. Check your Firestore Security Rules.');
     }
   };
+
+  const filteredMessages = messages.filter(msg => {
+    if (statusFilter === 'all') return true;
+    const status = msg.status || 'new';
+    return status === statusFilter;
+  });
 
   if (isAuthLoading) {
     return (
@@ -338,26 +348,49 @@ function App() {
           {/* LeftColumn (TicketList) */}
           <div className="col-span-5">
             <div className="flex gap-6 text-[10px] font-bold tracking-widest uppercase mb-8">
-              <button className="border-b-2 border-primary pb-1">All <span className="text-on-surface-variant ml-1">({messages.length})</span></button>
-              <button className="text-on-surface-variant hover:text-primary">New <span className="ml-1">({messages.filter(m => m.status === 'new' || !m.status).length})</span></button>
-              <button className="text-on-surface-variant hover:text-primary">In progress <span className="ml-1">({messages.filter(m => m.status === 'in progress').length})</span></button>
-              <button className="text-on-surface-variant hover:text-primary">Resolved <span className="ml-1">({messages.filter(m => m.status === 'resolved').length})</span></button>
+              <button 
+                onClick={() => setStatusFilter('all')}
+                className={`pb-1 transition-all ${statusFilter === 'all' ? 'border-b-2 border-primary font-black' : 'text-on-surface-variant hover:text-primary'}`}
+              >
+                All <span className="ml-1">({messages.length})</span>
+              </button>
+              <button 
+                onClick={() => setStatusFilter('new')}
+                className={`pb-1 transition-all ${statusFilter === 'new' ? 'border-b-2 border-primary font-black' : 'text-on-surface-variant hover:text-primary'}`}
+              >
+                New <span className="ml-1">({messages.filter(m => m.status === 'new' || !m.status).length})</span>
+              </button>
+              <button 
+                onClick={() => setStatusFilter('in progress')}
+                className={`pb-1 transition-all ${statusFilter === 'in progress' ? 'border-b-2 border-primary font-black' : 'text-on-surface-variant hover:text-primary'}`}
+              >
+                In progress <span className="ml-1">({messages.filter(m => m.status === 'in progress').length})</span>
+              </button>
+              <button 
+                onClick={() => setStatusFilter('resolved')}
+                className={`pb-1 transition-all ${statusFilter === 'resolved' ? 'border-b-2 border-primary font-black' : 'text-on-surface-variant hover:text-primary'}`}
+              >
+                Resolved <span className="ml-1">({messages.filter(m => m.status === 'resolved').length})</span>
+              </button>
             </div>
             <div className="border border-outline-variant rounded-sm overflow-hidden bg-surface-container-lowest">
-              <div className="bg-surface border-b border-outline-variant px-4 py-3">
-                <p className="text-[9px] font-bold tracking-[0.2em] text-on-surface-variant uppercase">{messages.length} Messages</p>
+              <div className="bg-surface border-b border-outline-variant px-4 py-3 flex justify-between items-center">
+                <p className="text-[9px] font-bold tracking-[0.2em] text-on-surface-variant uppercase">{filteredMessages.length} Messages</p>
+                {statusFilter !== 'all' && (
+                  <span className="text-[8px] bg-primary text-white px-2 py-0.5 rounded-full uppercase tracking-wider font-extrabold">{statusFilter}</span>
+                )}
               </div>
               {/* Ticket Cards */}
               <div className="divide-y divide-outline-variant min-h-[300px] max-h-[600px] overflow-y-auto">
-                {messages.length === 0 ? (
+                {filteredMessages.length === 0 ? (
                   <div className="p-10 text-center text-on-surface-variant flex items-center justify-center h-full">
-                    <p className="text-sm">No messages to display.</p>
+                    <p className="text-sm">No messages in this folder.</p>
                   </div>
                 ) : (
-                  messages.map(msg => (
+                  filteredMessages.map(msg => (
                     <div 
                       key={msg.id} 
-                      onClick={() => setSelectedMessage(msg)}
+                      onClick={() => { setSelectedMessage(msg); setUpdateError(''); }}
                       className={`p-5 cursor-pointer transition-colors ${selectedMessage?.id === msg.id ? 'bg-surface-container-high' : 'hover:bg-surface-container-low'}`}
                     >
                       <div className="flex justify-between items-start mb-2">
@@ -424,6 +457,12 @@ function App() {
                   <div className="p-8 flex-grow bg-surface-container-lowest w-full text-left">
                     <p className="text-sm leading-relaxed whitespace-pre-wrap">{selectedMessage.message}</p>
                   </div>
+                  {updateError && (
+                    <div className="mx-8 my-4 p-4 bg-red-50 border border-red-200 text-red-700 text-xs rounded-sm font-semibold text-left">
+                      <strong>Update Error:</strong> {updateError}
+                      <p className="mt-1 text-[10px] text-red-600 font-normal">This usually happens if your Firestore Security Rules block writes to the 'messages' collection.</p>
+                    </div>
+                  )}
                   <div className="p-6 border-t border-outline-variant bg-surface flex gap-4 w-full">
                      <button className="flex-1 bg-primary text-white py-3 text-xs font-bold tracking-widest uppercase hover:bg-opacity-90 transition-colors">
                        Reply to {selectedMessage.name ? selectedMessage.name.split(' ')[0] : 'Sender'}
