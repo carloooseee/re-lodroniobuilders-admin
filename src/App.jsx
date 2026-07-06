@@ -29,6 +29,7 @@ function App() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [updateError, setUpdateError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
 
   // Settings state
   const [homeImages, setHomeImages] = useState({});
@@ -219,7 +220,6 @@ function App() {
   };
 
   const handleDeleteMessage = async (messageId) => {
-    if (!window.confirm("Are you sure you want to permanently delete this message?")) return;
     setUpdateError('');
     try {
       await deleteDoc(doc(db, 'messages', messageId));
@@ -649,7 +649,7 @@ function App() {
                   filteredMessages.map(msg => (
                     <div 
                       key={msg.id} 
-                      onClick={() => { setSelectedMessage(msg); setUpdateError(''); }}
+                      onClick={() => { setSelectedMessage(msg); setUpdateError(''); setIsConfirmingDelete(false); }}
                       className={`p-5 cursor-pointer transition-colors ${selectedMessage?.id === msg.id ? 'bg-surface-container-high' : 'hover:bg-surface-container-low'}`}
                     >
                       <div className="flex justify-between items-start mb-2">
@@ -749,29 +749,56 @@ function App() {
                     </div>
                   )}
                   <div className="p-6 border-t border-outline-variant bg-surface flex gap-4 w-full">
-                     <a 
-                       href={`mailto:${selectedMessage.email}?subject=Re: ${encodeURIComponent(selectedMessage.subject || '')}`}
-                       className="flex-1 bg-primary text-white py-3 text-xs font-bold tracking-widest uppercase hover:bg-opacity-90 transition-colors text-center block"
-                     >
-                       Reply to {selectedMessage.name ? selectedMessage.name.split(' ')[0] : 'Sender'}
-                     </a>
-                     <select 
-                       className="border border-outline-variant bg-surface px-4 py-3 text-xs font-bold tracking-widest uppercase outline-none focus:border-primary"
-                       value={selectedMessage.status || ''}
-                       onChange={(e) => handleUpdateStatus(e.target.value)}
-                     >
-                       <option value="" disabled>Update Status</option>
-                       <option value="new">Mark New</option>
-                       <option value="in progress">Mark In Progress</option>
-                       <option value="resolved">Mark Resolved</option>
-                     </select>
-                     <button 
-                       onClick={() => handleDeleteMessage(selectedMessage.id)}
-                       className="border border-outline-variant hover:border-red-500 hover:text-red-500 text-on-surface-variant px-5 py-3 text-xs font-bold tracking-widest uppercase transition-colors flex items-center justify-center gap-1.5"
-                     >
-                       <span className="material-symbols-outlined text-[16px]">delete</span>
-                       Delete
-                     </button>
+                    {isConfirmingDelete ? (
+                      <>
+                        <div className="flex-grow flex items-center gap-2 text-red-600 font-sans text-xs font-semibold">
+                          <span className="material-symbols-outlined text-[18px]">warning</span>
+                          Are you sure you want to permanently delete this message?
+                        </div>
+                        <button 
+                          onClick={() => setIsConfirmingDelete(false)}
+                          className="border border-outline-variant hover:border-primary text-on-surface-variant hover:text-primary px-5 py-3 text-xs font-bold tracking-widest uppercase transition-colors flex items-center justify-center gap-1.5"
+                        >
+                          Cancel
+                        </button>
+                        <button 
+                          onClick={() => {
+                            setIsConfirmingDelete(false);
+                            handleDeleteMessage(selectedMessage.id);
+                          }}
+                          className="bg-red-600 hover:bg-red-700 text-white px-5 py-3 text-xs font-bold tracking-widest uppercase transition-colors flex items-center justify-center gap-1.5"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">delete</span>
+                          Confirm Delete
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <a 
+                          href={`mailto:${selectedMessage.email}?subject=Re: ${encodeURIComponent(selectedMessage.subject || '')}`}
+                          className="flex-1 bg-primary text-white py-3 text-xs font-bold tracking-widest uppercase hover:bg-opacity-90 transition-colors text-center block"
+                        >
+                          Reply to {selectedMessage.name ? selectedMessage.name.split(' ')[0] : 'Sender'}
+                        </a>
+                        <select 
+                          className="border border-outline-variant bg-surface px-4 py-3 text-xs font-bold tracking-widest uppercase outline-none focus:border-primary"
+                          value={selectedMessage.status || ''}
+                          onChange={(e) => handleUpdateStatus(e.target.value)}
+                        >
+                          <option value="" disabled>Update Status</option>
+                          <option value="new">Mark New</option>
+                          <option value="in progress">Mark In Progress</option>
+                          <option value="resolved">Mark Resolved</option>
+                        </select>
+                        <button 
+                          onClick={() => setIsConfirmingDelete(true)}
+                          className="border border-outline-variant hover:border-red-500 hover:text-red-500 text-on-surface-variant px-5 py-3 text-xs font-bold tracking-widest uppercase transition-colors flex items-center justify-center gap-1.5"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">delete</span>
+                          Delete
+                        </button>
+                      </>
+                    )}
                   </div>
                 </>
               )}
