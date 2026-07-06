@@ -18,6 +18,69 @@ const IMAGE_SLOTS = [
   { key: 'exterior_2', label: 'Exterior 3', section: 'Exteriors' },
 ];
 
+const DEFAULT_POLICY_ACCORDION = [
+  {
+    id: 1,
+    title: "Scope of Employee Relations",
+    icon: "shield",
+    content: `<p>The following policies govern the working relationship between R.E. Lodronio Builders Inc. and its employees. These standards apply to all workers deployed across company projects and sites.</p>\n<p>Covered areas include: personal conduct, dress code, corrective action, disciplinary capabilities and grievance policy, time and attendance, non-retaliation policy, leave policy, and work day policy.</p>`
+  },
+  {
+    id: 2,
+    title: "Casual / Temporary Employment",
+    icon: "person",
+    content: `<p>Casual employees are workers who do not have a regular or systematic hour of work, or an expectation of continuing work. A typical casual employee is employed on a daily basis when the need arises.</p>\n<p>Casual employees assigned to a particular job site will be notified by the employer, including the estimated time of completion of the project and the timeline of which the employee is expected to work.</p>\n<p>Worker contracts shall be co-terminus with the client contract. Once assigned to a particular job site, the worker's contract will be based on the actual scope of work that needs to be done within the start and completion of the project. The work contract may vary from three months to five months, extendable month on month if needed.</p>\n<p>The employer, upon signing of the worker's contract, shall explain in detail the scope of works expected from the worker and the estimated turnaround time for the worker to finish his assigned task.</p>\n<div class="pt-2">\n  <strong class="text-primary block mb-1">Payment of salaries:</strong>\n  <p>Employees shall be paid on a weekly basis (every Saturday of each month). The basic salary of the worker shall be indicated and discussed accordingly. The salary will be based solely on the attendance submitted by the timekeeper and verified by the immediate manager.</p>\n  <p class="mt-1 italic text-sm">Sample computation of basic salary: daily rate × number of days for one work week = Saturday pay-out.</p>\n</div>\n<div class="pt-2">\n  <strong class="text-primary block mb-1">Overtime:</strong>\n  <p>Overtime shall be advised by the project site once the need arises and shall be authorized by the engineer and need approval of Ar. Roco Lodronio.</p>\n  <p class="mt-1 italic text-sm">Sample computation: daily rate ÷ 8 hours = per hour rate × number of hours OT rendered.</p>\n</div>\n<div class="pt-2">\n  <strong class="text-primary block mb-1">Holiday work:</strong>\n  <p>Holiday work shall be advised to the worker prior to the schedule by the company manager or the immediate supervisor in the job site. Only the regular holiday is entitled for holiday pay.</p>\n  <ul class="list-disc pl-5 mt-2 space-y-1">\n    <li><strong>Special non-working holiday:</strong> additional 30% of the basic salary.</li>\n    <li><strong>Rest day:</strong> additional 50% of the basic salary.</li>\n    <li><strong>Regular holiday pay:</strong> 100% or times 2 of the basic salary.</li>\n  </ul>\n</div>\n<div class="pt-2">\n  <strong class="text-primary block mb-1">Night differential:</strong>\n  <p>Workers assigned to the night shift (10:00pm–6:00am) shall be entitled to a night differential.</p>\n  <p class="mt-1 italic text-sm">Calculation: Hourly rate × 10% × 8 hours.</p>\n</div>`
+  },
+  {
+    id: 3,
+    title: "Disciplinary Process",
+    icon: "description",
+    content: `<p>Common cases and complaints include, but are not limited to: behavioral (disrespect to authorities, client or people in the workplace), attendance and punctuality (excessive tardiness, absences, undertime), and violation of dress code policy (improper attire in the workplace).</p>\n<p>All policies and regulations shall be discussed with workers before onboarding, either by one-on-one discussion or by group. All cases shall be discussed within the company officers and legal advisor.</p>\n<p>Turnaround time for this process shall be fifteen (15) working days upon receipt of complaint. The worker shall be advised in case there will be an extension to come up with a decision.</p>\n<div class="pt-2">\n  <strong class="text-primary block mb-2">Disciplining employees escalation:</strong>\n  <div class="bg-surface p-4 border border-outline-variant/20 rounded font-serif italic text-center space-y-1">\n    <p>1st offense — verbal warning;</p>\n    <p>2nd offense — issuance of notice to explain (written warning);</p>\n    <p>3rd offense — issuance of NTE (for suspension);</p>\n    <p>4th offense — immediate termination of contract.</p>\n  </div>\n</div>\n<div class="pt-2">\n  <strong class="text-primary block mb-1">Dress code policy:</strong>\n  <p>The employer shall provide workers with three (3) long sleeves shirts. The uniform shall be free of charge provided that the worker will finish his three-month contract at a minimum. Failure to finish the contract would mean deductions of the uniform cost from the worker's final pay.</p>\n  <p>The company is not responsible for any loss or damage of worker's uniforms. Request for additional or replacement shall be for the account of the worker; payment can be in cash or salary deduction.</p>\n</div>`
+  },
+  {
+    id: 4,
+    title: "Attendance and Punctuality",
+    icon: "schedule",
+    content: `<p>Attendance and punctuality cases include the following violations in the corrective action matrix: unauthorized absences / AWOL; failure to call the manager or the HR officer during expected working hours; tardiness (30 minutes late in work schedule will be considered as violation of this policy); and unauthorized undertime once the employee leaves from the job site before the end of duty.</p>\n<p>Workers shall be advised of his absence prior to his work schedule or within the day of absence. The project site in-charge (site engineer/foreman) shall directly report this to the HR or admin officer on the exact day itself. A verbal warning shall be done to call attention of the worker and shall be considered as first offense.</p>\n<p>In case the worker returns to work under unauthorized absence / AWOL, the engineer/foreman has the authority to not accept the worker; however, a notice to explain with written explanation should be provided by the worker for evaluation by the company officers.</p>\n<p><strong>Documentation:</strong> signed and acknowledged notice to explain; written explanation by the worker; medical document, if any; signed notice of decision. This process shall be strictly implemented; the immediate supervisor and HR/admin officer consultant shall facilitate this process.</p>\n<div class="pt-2">\n  <strong class="text-primary block mb-2">Escalation process:</strong>\n  <div class="bg-surface p-4 border border-outline-variant/20 rounded font-serif italic text-center space-y-1">\n    <p>1st process — verbal warning;</p>\n    <p>2nd process — issuance of notice to explain;</p>\n    <p>3rd process — issuance of notice to explain with admin hearing schedule.</p>\n  </div>\n</div>`
+  },
+  {
+    id: 5,
+    title: "Workday policies",
+    icon: "calendar_today",
+    content: `<p>The worker shall be advised of his work schedule prior to deployment. Any changes shall be coordinated by the admin officer or immediate supervisor to the worker; therefore, updated contact information is needed.</p>\n<p>Work hours are from <strong>8:00AM–5:00PM</strong> with fifteen (15) minutes morning break from <strong>10:00AM–10:15AM</strong>, afternoon break from <strong>3:00PM–3:15PM</strong>, and one (1) hour lunch break from <strong>12:00NN–1:00PM</strong>, Monday to Saturday. Sunday is rest day.</p>\n<p>Changes in work schedule shall be communicated by the immediate supervisor to the worker. The worker shall adhere to the schedule; otherwise, the worker shall provide a valid explanation.</p>`
+  },
+  {
+    id: 6,
+    title: "Work Standby Procedure",
+    icon: "autorenew",
+    content: `<p>The worker shall be assigned and will be advised of his schedule prior to deployment. However, there will be instances that the worker will be pulled out from his designated job site to be transferred to another job site as need arises. The immediate supervisor shall communicate the changes and timeline to the worker accordingly.</p>\n<p>Any permanent change in the work schedule shall be communicated with the worker and indicated in his work contract.</p>`
+  },
+  {
+    id: 7,
+    title: "Involuntary Termination Procedure",
+    icon: "warning",
+    content: `<p>Major offenses include, but are not limited to: gross habitual negligence of duty, serious misconduct, and abandonment of work.</p>\n<div class="pt-2">\n  <strong class="text-primary block mb-1">Gross habitual negligence of duty:</strong>\n  <p>The worker shall be briefed of his job description upon signing the work contract and deployment; any clarification shall be discussed with the immediate supervisor. Failure to do so with proper investigation and process shall be subject to termination of employment.</p>\n</div>\n<div class="pt-2">\n  <strong class="text-primary block mb-1">Serious misconduct:</strong>\n  <p>The worker is expected to perform his duty at the job site with proper conduct and respect to co-workers. Any unruly act or misbehavior in the workplace with proper investigation and process shall be subject to termination of employment.</p>\n</div>`
+  },
+  {
+    id: 8,
+    title: "Return to Work, Job Abandonment, and Separation",
+    icon: "undo",
+    content: `<p>Workers returning after absence must follow proper notification and documentation procedures. Unauthorized absence or failure to report for work without valid notice may be considered job abandonment, subject to termination procedures.</p>\n<p>Upon separation, all company property — including uniforms, tools, and equipment — must be returned. Final pay will be released according to company policy and applicable labor regulations, after any lawful deductions.</p>`
+  },
+  {
+    id: 9,
+    title: "Bonus, 13th Month Pay and Other Incentives",
+    icon: "redeem",
+    content: `<div class="pt-2">\n  <strong class="text-primary block mb-1">Bonus and incentives:</strong>\n  <p>Any bonus or extra incentive is solely the prerogative of the employer. This is not in any way mandatory.</p>\n</div>\n<div class="pt-2">\n  <strong class="text-primary block mb-1">13th month pay:</strong>\n  <p>Workers who have rendered services for one (1) whole month during the calendar year shall be entitled to a 13th month pay, subject to computation based on actual attendance. Any worker who is still employed and actively working in a particular project on December 23 or before shall be entitled to a 13th month pay. Overtime pay and other additional income are not included in the computation.</p>\n</div>`
+  },
+  {
+    id: 10,
+    title: "Grievance Management Procedure",
+    icon: "chat_bubble_outline",
+    content: `<p>Grievances are complaints and problems encountered in the workplace. The complaints may be raised on any incident, discrimination, harassment, bullying or any indirect acts not personally directed to the complainant. All concerns shall be directed to the immediate supervisor or any HR/admin officer in the office.</p>\n<p>Complaints, problems and other concerns not raised or coordinated in the office or proper authority shall not be valid and will not be entertained.</p>\n<div class="pt-2">\n  <strong class="text-primary block mb-1">Non-retaliation:</strong>\n  <p>No retaliatory action may be taken against any worker for reporting suspected violations in good faith. Any allegations of retaliation should be reported immediately to the immediate supervisor or HR/admin officer.</p>\n</div>`
+  }
+];
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
@@ -35,6 +98,14 @@ function App() {
   const [homeImages, setHomeImages] = useState({});
   const [urlInputs, setUrlInputs] = useState({});       // { key: draftUrlString }
   const [saveStatus, setSaveStatus] = useState({});     // { key: 'saving' | 'saved' | 'error' }
+
+  const [contactContent, setContactContent] = useState({});
+  const [contactInputs, setContactInputs] = useState({});
+  const [contactSaveStatus, setContactSaveStatus] = useState(null);
+
+  const [policyContent, setPolicyContent] = useState({ accordionData: [] });
+  const [policyInputs, setPolicyInputs] = useState({ accordionData: [] });
+  const [policySaveStatus, setPolicySaveStatus] = useState(null);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -81,6 +152,7 @@ function App() {
       });
       // Fetch home image URLs from Firestore
       fetchHomeImages();
+      fetchTextContent();
       return () => unsubscribe();
     } else {
       setMessages([]);
@@ -100,6 +172,79 @@ function App() {
     } catch (err) {
       console.error('Error fetching home images:', err);
     }
+  };
+
+  const fetchTextContent = async () => {
+    try {
+      const contactSnap = await getDoc(doc(db, 'siteSettings', 'contactContent'));
+      if (contactSnap.exists()) {
+        setContactContent(contactSnap.data());
+        setContactInputs(contactSnap.data());
+      }
+      const policySnap = await getDoc(doc(db, 'siteSettings', 'policyContent'));
+      if (policySnap.exists()) {
+        const data = policySnap.data();
+        if (!data.accordionData || data.accordionData.length === 0) {
+          data.accordionData = DEFAULT_POLICY_ACCORDION;
+        }
+        setPolicyContent(data);
+        setPolicyInputs(data);
+      } else {
+          setPolicyContent({ accordionData: DEFAULT_POLICY_ACCORDION });
+          setPolicyInputs({ accordionData: DEFAULT_POLICY_ACCORDION });
+      }
+    } catch (err) {
+      console.error('Error fetching text content:', err);
+    }
+  };
+
+  const handleSaveContact = async () => {
+    setContactSaveStatus('saving');
+    try {
+      await setDoc(doc(db, 'siteSettings', 'contactContent'), contactInputs, { merge: true });
+      setContactContent(contactInputs);
+      setContactSaveStatus('saved');
+      setTimeout(() => setContactSaveStatus(null), 2000);
+    } catch (err) {
+      console.error('Save contact error:', err);
+      setContactSaveStatus('error');
+    }
+  };
+
+  const handleSavePolicy = async () => {
+    setPolicySaveStatus('saving');
+    try {
+      await setDoc(doc(db, 'siteSettings', 'policyContent'), policyInputs, { merge: true });
+      setPolicyContent(policyInputs);
+      setPolicySaveStatus('saved');
+      setTimeout(() => setPolicySaveStatus(null), 2000);
+    } catch (err) {
+      console.error('Save policy error:', err);
+      setPolicySaveStatus('error');
+    }
+  };
+
+  const handleAddPolicyAccordionItem = () => {
+      setPolicyInputs(prev => ({
+          ...prev,
+          accordionData: [...(prev.accordionData || []), { id: Date.now(), title: '', icon: 'shield', content: '' }]
+      }));
+  };
+
+  const handleRemovePolicyAccordionItem = (idToRemove) => {
+      setPolicyInputs(prev => ({
+          ...prev,
+          accordionData: (prev.accordionData || []).filter(item => item.id !== idToRemove)
+      }));
+  };
+
+  const handleUpdatePolicyAccordionItem = (idToUpdate, field, value) => {
+      setPolicyInputs(prev => ({
+          ...prev,
+          accordionData: (prev.accordionData || []).map(item => 
+              item.id === idToUpdate ? { ...item, [field]: value } : item
+          )
+      }));
   };
 
   /**
@@ -559,6 +704,131 @@ function App() {
                 </div>
               </div>
             ))}
+            
+            {/* Text Content Sections */}
+            <hr className="border-outline-variant mb-12" />
+            <div className="mb-16">
+              <h2 className="text-5xl serif-title leading-tight mb-8">Text Content</h2>
+              
+              {/* Contact Page Text */}
+              <div className="mb-12 bg-surface-container-lowest border border-outline-variant p-8">
+                <h3 className="text-[14px] font-bold tracking-[0.2em] uppercase text-on-surface-variant mb-6 border-b border-outline-variant pb-4">Contact Page</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">Intro Description</label>
+                    <textarea 
+                      value={contactInputs.introDesc || ''} 
+                      onChange={e => setContactInputs(prev => ({...prev, introDesc: e.target.value}))} 
+                      className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none focus:border-primary transition-colors min-h-[80px]"
+                      placeholder="Reach out directly for estimates..."
+                    />
+                  </div>
+                  
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">Company Info (Title | Subtitle)</label>
+                    <input type="text" value={contactInputs.companyName || ''} onChange={e => setContactInputs(prev => ({...prev, companyName: e.target.value}))} className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none mb-2" placeholder="Company Name" />
+                    <input type="text" value={contactInputs.companySubtitle || ''} onChange={e => setContactInputs(prev => ({...prev, companySubtitle: e.target.value}))} className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none" placeholder="Company Subtitle" />
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">Contact Person (Name | Role)</label>
+                    <input type="text" value={contactInputs.contactPersonName || ''} onChange={e => setContactInputs(prev => ({...prev, contactPersonName: e.target.value}))} className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none mb-2" placeholder="Person Name" />
+                    <input type="text" value={contactInputs.contactPersonRole || ''} onChange={e => setContactInputs(prev => ({...prev, contactPersonRole: e.target.value}))} className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none" placeholder="Person Role" />
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">Office Address</label>
+                    <input type="text" value={contactInputs.addressLine1 || ''} onChange={e => setContactInputs(prev => ({...prev, addressLine1: e.target.value}))} className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none mb-2" placeholder="Address Line 1" />
+                    <input type="text" value={contactInputs.addressLine2 || ''} onChange={e => setContactInputs(prev => ({...prev, addressLine2: e.target.value}))} className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none" placeholder="Address Line 2" />
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">Emails (Comma separated)</label>
+                    <input type="text" value={contactInputs.emails || ''} onChange={e => setContactInputs(prev => ({...prev, emails: e.target.value}))} className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none" placeholder="email1@test.com, email2@test.com" />
+                  </div>
+                  
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">Phones (Comma separated)</label>
+                    <input type="text" value={contactInputs.phones || ''} onChange={e => setContactInputs(prev => ({...prev, phones: e.target.value}))} className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none" placeholder="Phone 1, Phone 2" />
+                  </div>
+                </div>
+                
+                <div className="mt-6 flex justify-end">
+                  <button onClick={handleSaveContact} disabled={contactSaveStatus === 'saving'} className="bg-primary text-white py-2 px-6 text-[10px] font-bold tracking-widest uppercase hover:bg-opacity-90 disabled:opacity-50">
+                    {contactSaveStatus === 'saving' ? 'Saving...' : contactSaveStatus === 'saved' ? 'Saved!' : 'Save Contact Info'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Policy Page Text */}
+              <div className="mb-12 bg-surface-container-lowest border border-outline-variant p-8">
+                <h3 className="text-[14px] font-bold tracking-[0.2em] uppercase text-on-surface-variant mb-6 border-b border-outline-variant pb-4">Policy Page</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">Hero Description</label>
+                    <textarea 
+                      value={policyInputs.heroDesc || ''} 
+                      onChange={e => setPolicyInputs(prev => ({...prev, heroDesc: e.target.value}))} 
+                      className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none focus:border-primary transition-colors min-h-[80px]"
+                      placeholder="These policies define..."
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">Manual Intro Description</label>
+                    <textarea 
+                      value={policyInputs.manualDesc || ''} 
+                      onChange={e => setPolicyInputs(prev => ({...prev, manualDesc: e.target.value}))} 
+                      className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none focus:border-primary transition-colors min-h-[80px]"
+                      placeholder="Select a section below..."
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-4 flex justify-between items-center">
+                  <label className="text-[12px] font-bold tracking-widest uppercase text-on-surface-variant">Accordion Sections</label>
+                  <button onClick={handleAddPolicyAccordionItem} className="bg-surface-container-highest text-primary py-1.5 px-4 text-[9px] font-bold tracking-widest uppercase border border-outline-variant hover:border-primary">
+                    + Add Section
+                  </button>
+                </div>
+                
+                <div className="flex flex-col gap-4">
+                  {(policyInputs.accordionData || []).map((item, index) => (
+                    <div key={item.id} className="border border-outline-variant p-4 bg-surface relative group">
+                      <button onClick={() => handleRemovePolicyAccordionItem(item.id)} className="absolute top-2 right-2 text-on-surface-variant hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" title="Remove section">
+                        <span className="material-symbols-outlined text-lg">close</span>
+                      </button>
+                      
+                      <div className="flex gap-4 mb-3">
+                        <div className="w-1/3 flex flex-col gap-1">
+                          <label className="text-[9px] font-bold uppercase text-on-surface-variant">Title</label>
+                          <input type="text" value={item.title} onChange={e => handleUpdatePolicyAccordionItem(item.id, 'title', e.target.value)} className="border border-outline-variant bg-surface px-2 py-1.5 text-[11px] outline-none w-full" />
+                        </div>
+                        <div className="w-1/4 flex flex-col gap-1">
+                          <label className="text-[9px] font-bold uppercase text-on-surface-variant">Icon (Material Icon)</label>
+                          <input type="text" value={item.icon} onChange={e => handleUpdatePolicyAccordionItem(item.id, 'icon', e.target.value)} className="border border-outline-variant bg-surface px-2 py-1.5 text-[11px] outline-none w-full" />
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[9px] font-bold uppercase text-on-surface-variant">Content (HTML or plain text)</label>
+                        <textarea value={item.content} onChange={e => handleUpdatePolicyAccordionItem(item.id, 'content', e.target.value)} className="border border-outline-variant bg-surface px-2 py-1.5 text-[11px] outline-none w-full min-h-[100px] whitespace-pre-wrap font-mono" />
+                      </div>
+                    </div>
+                  ))}
+                  {(!policyInputs.accordionData || policyInputs.accordionData.length === 0) && (
+                    <div className="text-center p-4 border border-outline-variant text-on-surface-variant text-sm">No sections added yet.</div>
+                  )}
+                </div>
+
+                <div className="mt-8 flex justify-end">
+                  <button onClick={handleSavePolicy} disabled={policySaveStatus === 'saving'} className="bg-primary text-white py-2 px-6 text-[10px] font-bold tracking-widest uppercase hover:bg-opacity-90 disabled:opacity-50">
+                    {policySaveStatus === 'saving' ? 'Saving...' : policySaveStatus === 'saved' ? 'Saved!' : 'Save Policy Info'}
+                  </button>
+                </div>
+              </div>
+
+            </div>
           </div>
         )}
 
