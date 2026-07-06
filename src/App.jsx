@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { auth, db } from './firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
-import { doc, setDoc, getDoc, collection, query, onSnapshot, orderBy, updateDoc, deleteField } from 'firebase/firestore';
+import { doc, setDoc, getDoc, collection, query, onSnapshot, orderBy, updateDoc, deleteField, deleteDoc } from 'firebase/firestore';
 
 // ─── Image slot definitions (key, label, section) ───────────────────────────
 const IMAGE_SLOTS = [
@@ -28,6 +28,7 @@ function App() {
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [updateError, setUpdateError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Settings state
   const [homeImages, setHomeImages] = useState({});
@@ -217,10 +218,30 @@ function App() {
     }
   };
 
+  const handleDeleteMessage = async (messageId) => {
+    if (!window.confirm("Are you sure you want to permanently delete this message?")) return;
+    setUpdateError('');
+    try {
+      await deleteDoc(doc(db, 'messages', messageId));
+      if (selectedMessage?.id === messageId) {
+        setSelectedMessage(null);
+      }
+    } catch (err) {
+      console.error("Error deleting message:", err);
+      setUpdateError(err.message || 'Failed to delete message. Check your Firestore Security Rules.');
+    }
+  };
+
   const filteredMessages = messages.filter(msg => {
-    if (statusFilter === 'all') return true;
     const status = msg.status || 'new';
-    return status === statusFilter;
+    const matchesStatus = statusFilter === 'all' || status === statusFilter;
+    const matchesSearch = 
+      !searchQuery ||
+      (msg.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (msg.email || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (msg.subject || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (msg.message || '').toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesStatus && matchesSearch;
   });
 
   if (isAuthLoading) {
@@ -639,7 +660,7 @@ function App() {
                       </div>
                       <p className="text-xs font-semibold mb-1 truncate">{msg.subject}</p>
                       <p className="text-xs text-on-surface-variant line-clamp-2">{msg.message}</p>
-                      <div className="mt-3">
+                      <div className="mt-3 flex items-center justify-between">
                         <span className={`inline-block px-2 py-1 text-[9px] font-bold uppercase tracking-widest rounded-sm ${
                           (!msg.status || msg.status === 'new') ? 'bg-blue-100 text-blue-800' :
                           msg.status === 'in progress' ? 'bg-yellow-100 text-yellow-800' :
@@ -648,6 +669,9 @@ function App() {
                         }`}>
                           {msg.status || 'new'}
                         </span>
+                        {msg.ticketId && (
+                          <span className="text-[9px] font-mono text-on-surface-variant tracking-wider">{msg.ticketId}</span>
+                        )}
                       </div>
                     </div>
                   ))
@@ -656,9 +680,29 @@ function App() {
             </div>
           </div>
 
-          {/* RightColumn (Message Detail) */}
-          <div className="col-span-7">
-            <div className={`border border-outline-variant rounded-sm bg-surface-container-low h-full min-h-[500px] flex ${!selectedMessage ? 'items-center justify-center' : 'flex-col'}`}>
+          {/* RightColumn (Message Detail & Search Bar) */}
+          <div className="col-span-7 flex flex-col gap-6">
+            {/* Search Input on top of the view details section */}
+            <div className="relative w-full bg-surface-container-lowest border border-outline-variant rounded-sm flex items-center px-4 py-3">
+              <span className="material-symbols-outlined text-[18px] text-on-surface-variant mr-3">search</span>
+              <input
+                type="text"
+                placeholder="Search messages by name, email, subject, or content..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-transparent border-none outline-none text-[11px] font-sans text-primary placeholder:text-on-surface-variant/50"
+              />
+              {searchQuery && (
+                <button 
+                  onClick={() => setSearchQuery('')}
+                  className="material-symbols-outlined text-[16px] text-on-surface-variant hover:text-primary transition-colors ml-2"
+                >
+                  close
+                </button>
+              )}
+            </div>
+
+            <div className={`border border-outline-variant rounded-sm bg-surface-container-low flex-grow min-h-[500px] flex ${!selectedMessage ? 'items-center justify-center' : 'flex-col'}`}>
               {!selectedMessage ? (
                 <p className="text-sm text-on-surface-variant">Select a message to view details</p>
               ) : (
@@ -666,7 +710,10 @@ function App() {
                   <div className="p-8 border-b border-outline-variant bg-surface w-full">
                     <div className="flex justify-between items-start mb-6">
                       <div>
-                        <h2 className="text-2xl font-serif mb-2">{selectedMessage.subject}</h2>
+                        <h2 className="text-2xl font-serif mb-1">{selectedMessage.subject}</h2>
+                        {selectedMessage.ticketId && (
+                          <p className="text-[10px] font-mono text-on-surface-variant tracking-widest mb-3">{selectedMessage.ticketId}</p>
+                        )}
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 bg-surface-container-highest rounded-full flex items-center justify-center text-xs font-bold">
                             {selectedMessage.name ? selectedMessage.name.charAt(0).toUpperCase() : '?'}
@@ -697,14 +744,17 @@ function App() {
                   </div>
                   {updateError && (
                     <div className="mx-8 my-4 p-4 bg-red-50 border border-red-200 text-red-700 text-xs rounded-sm font-semibold text-left">
-                      <strong>Update Error:</strong> {updateError}
-                      <p className="mt-1 text-[10px] text-red-600 font-normal">This usually happens if your Firestore Security Rules block writes to the 'messages' collection.</p>
+                      <strong>Action Error:</strong> {updateError}
+                      <p className="mt-1 text-[10px] text-red-600 font-normal font-sans">This usually happens if your Firestore Security Rules block updates/deletes in the 'messages' collection.</p>
                     </div>
                   )}
                   <div className="p-6 border-t border-outline-variant bg-surface flex gap-4 w-full">
-                     <button className="flex-1 bg-primary text-white py-3 text-xs font-bold tracking-widest uppercase hover:bg-opacity-90 transition-colors">
+                     <a 
+                       href={`mailto:${selectedMessage.email}?subject=Re: ${encodeURIComponent(selectedMessage.subject || '')}`}
+                       className="flex-1 bg-primary text-white py-3 text-xs font-bold tracking-widest uppercase hover:bg-opacity-90 transition-colors text-center block"
+                     >
                        Reply to {selectedMessage.name ? selectedMessage.name.split(' ')[0] : 'Sender'}
-                     </button>
+                     </a>
                      <select 
                        className="border border-outline-variant bg-surface px-4 py-3 text-xs font-bold tracking-widest uppercase outline-none focus:border-primary"
                        value={selectedMessage.status || ''}
@@ -715,6 +765,13 @@ function App() {
                        <option value="in progress">Mark In Progress</option>
                        <option value="resolved">Mark Resolved</option>
                      </select>
+                     <button 
+                       onClick={() => handleDeleteMessage(selectedMessage.id)}
+                       className="border border-outline-variant hover:border-red-500 hover:text-red-500 text-on-surface-variant px-5 py-3 text-xs font-bold tracking-widest uppercase transition-colors flex items-center justify-center gap-1.5"
+                     >
+                       <span className="material-symbols-outlined text-[16px]">delete</span>
+                       Delete
+                     </button>
                   </div>
                 </>
               )}
