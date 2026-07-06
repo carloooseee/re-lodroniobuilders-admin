@@ -2,17 +2,37 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { auth, db } from './firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
-import { doc, setDoc, getDoc, collection, query, onSnapshot, orderBy, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, collection, query, onSnapshot, orderBy, updateDoc, deleteField } from 'firebase/firestore';
+
+// ─── Image slot definitions (key, label, section) ───────────────────────────
+const IMAGE_SLOTS = [
+  { key: 'hero_0', label: 'Slide 1', section: 'Hero Slideshow' },
+  { key: 'hero_1', label: 'Slide 2', section: 'Hero Slideshow' },
+  { key: 'hero_2', label: 'Slide 3', section: 'Hero Slideshow' },
+  { key: 'hero_3', label: 'Slide 4', section: 'Hero Slideshow' },
+  { key: 'interior_0', label: 'Interior 1', section: 'Interiors' },
+  { key: 'interior_1', label: 'Interior 2', section: 'Interiors' },
+  { key: 'interior_2', label: 'Interior 3', section: 'Interiors' },
+  { key: 'exterior_0', label: 'Exterior 1', section: 'Exteriors' },
+  { key: 'exterior_1', label: 'Exterior 2', section: 'Exteriors' },
+  { key: 'exterior_2', label: 'Exterior 3', section: 'Exteriors' },
+];
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [userData, setUserData] = useState(null);
   const [authMode, setAuthMode] = useState('login'); // 'login' or 'signup'
+  const [currentTab, setCurrentTab] = useState('messages'); // 'messages' | 'settings'
   const [messages, setMessages] = useState([]);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [updateError, setUpdateError] = useState('');
+
+  // Settings state
+  const [homeImages, setHomeImages] = useState({});
+  const [urlInputs, setUrlInputs] = useState({});       // { key: draftUrlString }
+  const [saveStatus, setSaveStatus] = useState({});     // { key: 'saving' | 'saved' | 'error' }
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -57,12 +77,91 @@ function App() {
         });
         setMessages(msgs);
       });
+      // Fetch home image URLs from Firestore
+      fetchHomeImages();
       return () => unsubscribe();
     } else {
       setMessages([]);
       setSelectedMessage(null);
+      setHomeImages({});
     }
   }, [isAuthenticated]);
+
+  const fetchHomeImages = async () => {
+    try {
+      const snap = await getDoc(doc(db, 'siteSettings', 'homeImages'));
+      if (snap.exists()) {
+        const data = snap.data();
+        setHomeImages(data);
+        setUrlInputs(data); // pre-fill inputs with existing URLs
+      }
+    } catch (err) {
+      console.error('Error fetching home images:', err);
+    }
+  };
+
+  /**
+   * Converts share-page URLs into direct embeddable image URLs.
+   * Supports Google Drive and Dropbox share links.
+   */
+  const convertToDirectUrl = (rawUrl) => {
+    const url = (rawUrl || '').trim();
+
+    // Google Drive: https://drive.google.com/file/d/FILE_ID/view?...
+    //           or: https://drive.google.com/open?id=FILE_ID
+    const gDriveFileMatch = url.match(/drive\.google\.com\/file\/d\/([^/?\s]+)/);
+    const gDriveOpenMatch = url.match(/drive\.google\.com\/open\?id=([^&\s]+)/);
+    const fileId = (gDriveFileMatch && gDriveFileMatch[1]) || (gDriveOpenMatch && gDriveOpenMatch[1]);
+    if (fileId) {
+      return `https://drive.google.com/thumbnail?id=${fileId}&sz=w2000`;
+    }
+
+    // Dropbox: https://www.dropbox.com/...?dl=0  →  ?dl=1 (direct download/image)
+    if (url.includes('dropbox.com')) {
+      return url.replace(/[?&]dl=0/, '').replace(/\?$/, '') + (url.includes('?') ? '&raw=1' : '?raw=1');
+    }
+
+    return url; // already a direct URL — pass through as-is
+  };
+
+  const handleSaveUrl = async (slotKey) => {
+    const raw = (urlInputs[slotKey] || '').trim();
+    const url = convertToDirectUrl(raw);
+    // If conversion changed the URL, update the input to show what's being saved
+    if (url !== raw) setUrlInputs(prev => ({ ...prev, [slotKey]: url }));
+    setSaveStatus(prev => ({ ...prev, [slotKey]: 'saving' }));
+    try {
+      await setDoc(doc(db, 'siteSettings', 'homeImages'), { [slotKey]: url }, { merge: true });
+      setHomeImages(prev => ({ ...prev, [slotKey]: url }));
+      setSaveStatus(prev => ({ ...prev, [slotKey]: 'saved' }));
+      // Clear the 'saved' badge after 2s
+      setTimeout(() => setSaveStatus(prev => ({ ...prev, [slotKey]: null })), 2000);
+    } catch (err) {
+      console.error('Save error:', err);
+      setSaveStatus(prev => ({ ...prev, [slotKey]: 'error' }));
+    }
+  };
+  
+  const handleRemoveUrl = async (slotKey) => {
+    setSaveStatus(prev => ({ ...prev, [slotKey]: 'saving' }));
+    try {
+      await setDoc(doc(db, 'siteSettings', 'homeImages'), {
+        [slotKey]: deleteField()
+      }, { merge: true });
+      
+      setHomeImages(prev => {
+        const updated = { ...prev };
+        delete updated[slotKey];
+        return updated;
+      });
+      setUrlInputs(prev => ({ ...prev, [slotKey]: '' }));
+      setSaveStatus(prev => ({ ...prev, [slotKey]: 'saved' }));
+      setTimeout(() => setSaveStatus(prev => ({ ...prev, [slotKey]: null })), 2000);
+    } catch (err) {
+      console.error('Remove error:', err);
+      setSaveStatus(prev => ({ ...prev, [slotKey]: 'error' }));
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -280,13 +379,27 @@ function App() {
           </div>
           <div>
             <h1 className="text-xl font-medium tracking-tight serif-title leading-none">RE Lodronio Builders Inc.</h1>
-            <p className="text-[10px] tracking-[0.2em] text-on-surface-variant mt-1 uppercase">Admin • Inbox</p>
+            <p className="text-[10px] tracking-[0.2em] text-on-surface-variant mt-1 uppercase">Admin • {currentTab === 'messages' ? 'Inbox' : 'Settings'}</p>
           </div>
         </div>
         <nav className="flex items-center gap-12">
           <div className="flex gap-8 text-[11px] font-semibold tracking-widest uppercase">
-            <a className="text-primary border-b border-primary pb-1" href="#">Messages</a>
-            <a className="text-on-surface-variant hover:text-primary transition-colors" href="#">Settings</a>
+            <button
+              onClick={() => setCurrentTab('messages')}
+              className={`pb-1 transition-colors ${
+                currentTab === 'messages'
+                  ? 'text-primary border-b border-primary'
+                  : 'text-on-surface-variant hover:text-primary'
+              }`}
+            >Messages</button>
+            <button
+              onClick={() => setCurrentTab('settings')}
+              className={`pb-1 transition-colors ${
+                currentTab === 'settings'
+                  ? 'text-primary border-b border-primary'
+                  : 'text-on-surface-variant hover:text-primary'
+              }`}
+            >Settings</button>
           </div>
           <div className="flex items-center gap-6 border-l border-outline-variant pl-8">
             <div className="text-right">
@@ -305,7 +418,132 @@ function App() {
       </header>
 
       <main className="flex-grow px-12 pt-12 pb-24">
-        {/* InboxHero */}
+        {currentTab === 'settings' && (
+          <div>
+            {/* Settings Hero */}
+            <div className="mb-16 flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
+              <div className="max-w-2xl">
+                <p className="text-[11px] tracking-[0.3em] text-on-surface-variant uppercase mb-4">(Settings)</p>
+                <h2 className="text-7xl serif-title leading-tight">Home Page<br /><span className="italic">Images.</span></h2>
+                <p className="mt-8 text-sm text-on-surface-variant leading-relaxed">
+                  Paste a publicly accessible image URL for each slot. Changes are reflected immediately on the live website. You can use any image host (e.g. Imgur, Cloudinary, Google Drive public link).
+                </p>
+              </div>
+              
+              <div className="bg-surface-container border border-outline-variant p-6 max-w-sm w-full flex flex-col gap-4">
+                <div className="flex items-start gap-3 text-primary">
+                  <span className="material-symbols-outlined text-2xl mt-0.5 text-blue-500">folder_shared</span>
+                  <div>
+                    <h4 className="font-serif text-lg leading-tight">Drive Image Folder</h4>
+                    <p className="text-xs text-on-surface-variant mt-1.5 leading-relaxed">
+                      Upload your image files to this folder, copy their share link, and paste them into the slots below.
+                    </p>
+                  </div>
+                </div>
+                <a
+                  href="https://drive.google.com/drive/folders/164cL3RHsVZuxvzVrKG32uTlNyRnUPItm?usp=sharing"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 text-[11px] font-bold tracking-widest uppercase transition-colors flex items-center justify-center gap-2"
+                >
+                  <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+                  Open Upload Folder
+                </a>
+              </div>
+            </div>
+            <hr className="border-outline-variant mb-12" />
+
+            {/* Group slots by section */}
+            {['Hero Slideshow', 'Interiors', 'Exteriors'].map(section => (
+              <div key={section} className="mb-16">
+                <h3 className="text-[11px] font-bold tracking-[0.3em] uppercase text-on-surface-variant mb-8 border-b border-outline-variant pb-4">
+                  {section}
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  {IMAGE_SLOTS.filter(s => s.section === section).map(slot => {
+                    const currentUrl = homeImages[slot.key];
+                    const draftUrl = urlInputs[slot.key] ?? currentUrl ?? '';
+                    const status = saveStatus[slot.key]; // 'saving' | 'saved' | 'error' | null
+                    return (
+                      <div key={slot.key} className="flex flex-col gap-3">
+                        {/* Image Preview */}
+                        <div
+                          className="relative w-full aspect-[4/3] bg-surface-container border border-outline-variant overflow-hidden"
+                          style={{ background: '#1a1a1a' }}
+                        >
+                          {currentUrl ? (
+                            <img
+                              src={currentUrl}
+                              alt={slot.label}
+                              className="w-full h-full object-cover"
+                              onError={e => { e.target.style.display = 'none'; }}
+                            />
+                          ) : (
+                            <div className="w-full h-full flex flex-col items-center justify-center text-on-surface-variant gap-2">
+                              <span className="material-symbols-outlined text-3xl opacity-30">image</span>
+                              <p className="text-[9px] tracking-widest uppercase opacity-40">No image set</p>
+                            </div>
+                          )}
+                          {/* Saved overlay flash */}
+                          {status === 'saved' && (
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                              <span className="material-symbols-outlined text-green-400 text-4xl">check_circle</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Slot label */}
+                        <p className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">{slot.label}</p>
+
+                        {/* URL input */}
+                        <input
+                          type="url"
+                          placeholder="Paste image URL or Google Drive share link..."
+                          value={draftUrl}
+                          onChange={e => setUrlInputs(prev => ({ ...prev, [slot.key]: e.target.value }))}
+                          className="w-full border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none focus:border-primary transition-colors font-mono"
+                        />
+                        <p className="text-[9px] text-on-surface-variant opacity-60 leading-relaxed -mt-1">
+                          Google Drive &amp; Dropbox share links are auto-converted.
+                        </p>
+
+                        {/* Action buttons */}
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleSaveUrl(slot.key)}
+                            disabled={status === 'saving' || draftUrl === (homeImages[slot.key] ?? '')}
+                            className="flex-grow border border-outline-variant bg-surface py-2.5 text-[9px] font-bold tracking-widest uppercase hover:border-primary hover:text-primary transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+                          >
+                            <span className="material-symbols-outlined text-[14px]">
+                              {status === 'saving' ? 'sync' : status === 'saved' ? 'check' : status === 'error' ? 'error' : 'save'}
+                            </span>
+                            {status === 'saving' ? 'Saving...' : status === 'saved' ? 'Saved!' : status === 'error' ? 'Error' : 'Save'}
+                          </button>
+                          
+                          {currentUrl && (
+                            <button
+                              onClick={() => handleRemoveUrl(slot.key)}
+                              disabled={status === 'saving'}
+                              className="border border-outline-variant bg-surface px-3 py-2.5 text-[9px] font-bold tracking-widest uppercase hover:border-red-500 hover:text-red-500 transition-colors disabled:opacity-40 flex items-center justify-center gap-1.5"
+                              title="Remove custom image and restore default"
+                            >
+                              <span className="material-symbols-outlined text-[14px]">delete</span>
+                              Remove
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {currentTab === 'messages' && (
+          <div>
+          {/* InboxHero */}
         <div className="mb-16">
           <p className="text-[11px] tracking-[0.3em] text-on-surface-variant uppercase mb-4">(Inbox)</p>
           <div className="flex justify-between items-end">
@@ -483,6 +721,8 @@ function App() {
             </div>
           </div>
         </div>
+        </div>
+        )}
       </main>
 
       <footer className="border-t border-outline-variant px-12 py-10 flex justify-between items-center text-[11px] font-bold tracking-widest uppercase">
