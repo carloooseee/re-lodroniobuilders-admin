@@ -29,7 +29,7 @@ isSupported().then((yes) => {
   }
 });
 
-// Initialize Auth and Firestore
+// Initialize Auth, Firestore
 const auth = getAuth(app);
 const db = getFirestore(app);
 
