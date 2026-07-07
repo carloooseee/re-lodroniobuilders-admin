@@ -1,9 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import { auth, db, firebaseConfig } from './firebase';
-import { initializeApp } from 'firebase/app';
+import { auth, db, app } from './firebase';
+import { initializeApp, getApps } from 'firebase/app';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, getAuth } from 'firebase/auth';
 import { doc, setDoc, getDoc, collection, query, onSnapshot, orderBy, updateDoc, deleteField, deleteDoc, addDoc } from 'firebase/firestore';
+
+// ─── Paragraph helpers ───────────────────────────────────────────────────────
+// Strips <p> tags so the textarea shows clean plain text.
+const htmlToPlainText = (html = '') => {
+  // Replace closing </p> with a double newline (paragraph break), strip all other tags.
+  return html
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&nbsp;/g, ' ')
+    .trim();
+};
+
+// Wraps each non-empty paragraph (split by blank lines) back into <p> tags.
+const plainTextToHtml = (text = '') => {
+  return text
+    .split(/\n{2,}/)
+    .map(p => p.trim())
+    .filter(Boolean)
+    .map(p => `<p>${p.replace(/\n/g, '<br />')}</p>`)
+    .join('\n');
+};
 
 // ─── Image slot definitions (key, label, section) ───────────────────────────
 const IMAGE_SLOTS = [
@@ -82,7 +107,7 @@ const DEFAULT_POLICY_ACCORDION = [
   }
 ];
 
-const secondaryApp = initializeApp(firebaseConfig, 'Secondary');
+const secondaryApp = getApps().find(a => a.name === 'Secondary') || initializeApp(app.options, 'Secondary');
 const secondaryAuth = getAuth(secondaryApp);
 
 function App() {
@@ -238,10 +263,22 @@ function App() {
           data.accordionData = DEFAULT_POLICY_ACCORDION;
         }
         setPolicyContent(data);
-        setPolicyInputs(data);
+        // Convert stored HTML content to plain text for the textarea
+        setPolicyInputs({
+          ...data,
+          accordionData: (data.accordionData || []).map(item => ({
+            ...item,
+            content: htmlToPlainText(item.content)
+          }))
+        });
       } else {
         setPolicyContent({ accordionData: DEFAULT_POLICY_ACCORDION });
-        setPolicyInputs({ accordionData: DEFAULT_POLICY_ACCORDION });
+        setPolicyInputs({
+          accordionData: DEFAULT_POLICY_ACCORDION.map(item => ({
+            ...item,
+            content: htmlToPlainText(item.content)
+          }))
+        });
       }
     } catch (err) {
       console.error('Error fetching text content:', err);
@@ -277,8 +314,16 @@ function App() {
   const handleSavePolicy = async () => {
     setPolicySaveStatus('saving');
     try {
-      await setDoc(doc(db, 'siteSettings', 'policyContent'), policyInputs, { merge: true });
-      setPolicyContent(policyInputs);
+      // Convert plain-text paragraphs back to <p> HTML before saving to Firestore
+      const dataToSave = {
+        ...policyInputs,
+        accordionData: (policyInputs.accordionData || []).map(item => ({
+          ...item,
+          content: plainTextToHtml(item.content)
+        }))
+      };
+      await setDoc(doc(db, 'siteSettings', 'policyContent'), dataToSave, { merge: true });
+      setPolicyContent(dataToSave);
       setPolicySaveStatus('saved');
       setTimeout(() => setPolicySaveStatus(null), 2000);
     } catch (err) {
@@ -433,12 +478,12 @@ function App() {
 
   const handleApproveMember = async (pendingMember) => {
     try {
-      // Create user account via secondary app
-      // Generate a random secure password for creation, they will reset it via email
+      // Create user account via secondary app so the admin is not signed out.
+      // Generate a random secure temp password — user will set their own password via email.
       const tempPassword = Math.random().toString(36).slice(-12) + 'Aa1!';
       const userCredential = await createUserWithEmailAndPassword(secondaryAuth, pendingMember.email, tempPassword);
 
-      // Send password reset email using secondaryAuth
+      // Send set password email so the new user can set their own password
       await sendPasswordResetEmail(secondaryAuth, pendingMember.email);
 
       // Save to users collection
@@ -455,7 +500,12 @@ function App() {
 
       // Delete from pending_users
       await deleteDoc(doc(db, 'pending_users', pendingMember.id));
-      alert(`User ${pendingMember.email} approved and password reset email sent.`);
+
+      // Sign the newly created account out of the secondary instance to avoid
+      // a lingering authenticated session on every approval.
+      await signOut(secondaryAuth);
+
+      alert(`User ${pendingMember.email} approved and set password email sent.`);
     } catch (err) {
       console.error("Error approving member:", err);
       alert("Error approving member: " + err.message);
@@ -982,8 +1032,10 @@ function App() {
                         </div>
                       </div>
                       <div className="flex flex-col gap-1">
-                        <label className="text-[9px] font-bold uppercase text-on-surface-variant">Content (HTML or plain text)</label>
-                        <textarea value={item.content} onChange={e => handleUpdatePolicyAccordionItem(item.id, 'content', e.target.value)} className="border border-outline-variant bg-surface px-2 py-1.5 text-[11px] outline-none w-full min-h-[100px] whitespace-pre-wrap font-mono" />
+                        <label className="text-[9px] font-bold uppercase text-on-surface-variant">Content — plain text, separate paragraphs with a blank line</label>
+                        <textarea value={item.content} onChange={e => handleUpdatePolicyAccordionItem(item.id, 'content', e.target.value)} className="border border-outline-variant bg-surface px-2 py-1.5 text-[11px] outline-none w-full min-h-[100px] whitespace-pre-wrap font-mono" placeholder="Type your paragraph here.
+
+Add a blank line to start a new paragraph." />
                       </div>
                     </div>
                   ))}

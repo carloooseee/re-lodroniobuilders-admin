@@ -33,4 +33,4 @@ isSupported().then((yes) => {
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-export { app, analytics, auth, db, firebaseConfig };
+export { app, analytics, auth, db };
