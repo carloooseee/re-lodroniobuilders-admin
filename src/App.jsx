@@ -567,6 +567,7 @@ function App() {
       !searchQuery ||
       (msg.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (msg.email || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (msg.phone || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (msg.subject || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
       (msg.message || '').toLowerCase().includes(searchQuery.toLowerCase());
     return matchesStatus && matchesSearch;
@@ -1213,6 +1214,9 @@ Add a blank line to start a new paragraph." />
                               <div>
                                 <p className="text-sm font-bold">{selectedMessage.name}</p>
                                 <p className="text-xs text-on-surface-variant">{selectedMessage.email}</p>
+                                {selectedMessage.phone && (
+                                  <p className="text-xs text-on-surface-variant">Phone: {selectedMessage.phone}</p>
+                                )}
                               </div>
                             </div>
                           </div>
