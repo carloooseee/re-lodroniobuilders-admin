@@ -1190,9 +1190,67 @@ function App() {
                           {editingProject.actualImage && <img src={editingProject.actualImage} className="h-32 object-cover border border-outline-variant mt-2" />}
                         </div>
                         
-                        <div className="flex flex-col gap-2 md:col-span-2">
-                          <label className="text-[10px] font-bold uppercase text-on-surface-variant">Additional Images (Comma separated URLs)</label>
-                          <textarea value={editingProject.additionalImages.join(', ')} onChange={e => setEditingProject({...editingProject, additionalImages: e.target.value.split(',').map(s=>s.trim()).filter(Boolean)})} className="border border-outline-variant bg-surface px-3 py-2 text-sm outline-none focus:border-primary min-h-[100px] font-mono" />
+                        <div className="flex flex-col gap-3 md:col-span-2">
+                          <div className="flex justify-between items-center">
+                            <label className="text-[10px] font-bold uppercase text-on-surface-variant">Additional Images</label>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const current = editingProject.additionalImages || [];
+                                setEditingProject({ ...editingProject, additionalImages: [...current, ''] });
+                              }}
+                              className="text-[9px] font-bold uppercase tracking-wider text-primary border border-outline-variant hover:border-primary px-3 py-1 bg-surface-container-highest transition-colors"
+                            >
+                              + Add Image URL
+                            </button>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 gap-3 max-h-[300px] overflow-y-auto pr-1">
+                            {(editingProject.additionalImages || []).map((url, idx) => (
+                              <div key={idx} className="flex gap-2 items-start border border-outline-variant/30 p-3 bg-surface-container-lowest rounded-sm">
+                                <div className="flex-grow flex flex-col gap-2">
+                                  <div className="flex gap-2">
+                                    <input
+                                      type="url"
+                                      value={url}
+                                      onChange={e => {
+                                        const copy = [...editingProject.additionalImages];
+                                        copy[idx] = e.target.value;
+                                        setEditingProject({ ...editingProject, additionalImages: copy });
+                                      }}
+                                      placeholder="Paste Google Drive share link or image URL..."
+                                      className="flex-grow border border-outline-variant bg-surface px-3 py-1.5 text-xs outline-none focus:border-primary font-mono"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const copy = [...editingProject.additionalImages];
+                                        copy.splice(idx, 1);
+                                        setEditingProject({ ...editingProject, additionalImages: copy });
+                                      }}
+                                      className="material-symbols-outlined text-red-500 hover:text-red-700 bg-surface-container px-2 py-1.5 border border-outline-variant flex items-center justify-center rounded-sm text-sm"
+                                      title="Remove Image"
+                                    >
+                                      delete
+                                    </button>
+                                  </div>
+                                  {url && (
+                                    <div className="relative w-24 h-16 bg-surface-container border border-outline-variant overflow-hidden rounded-sm">
+                                      <img
+                                        src={convertToDirectUrl(url)}
+                                        alt={`Preview ${idx + 1}`}
+                                        className="w-full h-full object-cover"
+                                        onError={e => { e.target.style.display = 'none'; }}
+                                      />
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+                            {(!editingProject.additionalImages || editingProject.additionalImages.length === 0) && (
+                              <p className="text-[10px] italic text-on-surface-variant/60 py-2">No additional images added yet.</p>
+                            )}
+                          </div>
                         </div>
                       </div>
 
