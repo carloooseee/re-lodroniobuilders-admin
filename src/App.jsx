@@ -161,6 +161,10 @@ function App() {
   const [policyInputs, setPolicyInputs] = useState({ accordionData: [] });
   const [policySaveStatus, setPolicySaveStatus] = useState(null);
 
+  const [gdriveLink, setGdriveLink] = useState('https://drive.google.com');
+  const [gdriveLinkInput, setGdriveLinkInput] = useState('https://drive.google.com');
+  const [gdriveSaveStatus, setGdriveSaveStatus] = useState(null);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -309,6 +313,12 @@ function App() {
           }))
         });
       }
+      const gdriveSnap = await getDoc(doc(db, 'siteSettings', 'gdriveSettings'));
+      if (gdriveSnap.exists()) {
+        const data = gdriveSnap.data();
+        setGdriveLink(data.gdriveLink || 'https://drive.google.com');
+        setGdriveLinkInput(data.gdriveLink || 'https://drive.google.com');
+      }
     } catch (err) {
       console.error('Error fetching text content:', err);
     }
@@ -358,6 +368,19 @@ function App() {
     } catch (err) {
       console.error('Save policy error:', err);
       setPolicySaveStatus('error');
+    }
+  };
+
+  const handleSaveGdriveLink = async () => {
+    setGdriveSaveStatus('saving');
+    try {
+      await setDoc(doc(db, 'siteSettings', 'gdriveSettings'), { gdriveLink: gdriveLinkInput }, { merge: true });
+      setGdriveLink(gdriveLinkInput);
+      setGdriveSaveStatus('saved');
+      setTimeout(() => setGdriveSaveStatus(null), 2000);
+    } catch (err) {
+      console.error('Save gdrive link error:', err);
+      setGdriveSaveStatus('error');
     }
   };
 
@@ -978,6 +1001,16 @@ function App() {
               >
                 Policy & Contact
               </button>
+              <button
+                onClick={() => setEditSiteTab('guide')}
+                className={`font-label-caps text-label-caps uppercase tracking-widest px-6 py-3 border transition-all duration-300 ${
+                  editSiteTab === 'guide'
+                    ? 'bg-primary text-on-primary border-primary font-semibold'
+                    : 'bg-transparent text-on-surface-variant border-outline-variant/30 hover:border-primary/50'
+                }`}
+              >
+                Drive & Content Guide
+              </button>
             </div>
 
             {/* Sub Tab Content */}
@@ -1418,6 +1451,133 @@ Add a blank line to start a new paragraph." />
 
             </div>
           
+              </div>
+            )}
+
+            {editSiteTab === 'guide' && (
+              <div>
+                <hr className="border-outline-variant mb-12" />
+                
+                {/* Google Drive Upload Link Section */}
+                <div className="mb-12 bg-surface-container-lowest border border-outline-variant p-8">
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 border-b border-outline-variant pb-4">
+                    <div>
+                      <h3 className="text-[14px] font-bold tracking-[0.2em] uppercase text-on-surface-variant">
+                        Google Drive Asset Folder
+                      </h3>
+                      <p className="text-xs text-on-surface-variant/70 mt-1">
+                        Configure the folder link where website images and files are uploaded.
+                      </p>
+                    </div>
+                    {gdriveLink && (
+                      <a 
+                        href={gdriveLink} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="flex items-center gap-2 bg-surface-container-highest text-primary py-1.5 px-4 text-[9px] font-bold tracking-widest uppercase border border-outline-variant hover:border-primary transition-colors"
+                      >
+                        <span className="material-symbols-outlined text-sm">open_in_new</span>
+                        Open Drive Folder
+                      </a>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col gap-2 max-w-3xl mb-6">
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">
+                      Google Drive Folder URL
+                    </label>
+                    <input
+                      type="url"
+                      value={gdriveLinkInput}
+                      onChange={e => setGdriveLinkInput(e.target.value)}
+                      className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none focus:border-primary transition-colors font-mono w-full"
+                      placeholder="https://drive.google.com/drive/folders/..."
+                    />
+                  </div>
+
+                  <div className="flex justify-end">
+                    <button 
+                      onClick={handleSaveGdriveLink} 
+                      disabled={gdriveSaveStatus === 'saving'} 
+                      className="bg-primary text-white py-2 px-6 text-[10px] font-bold tracking-widest uppercase hover:bg-opacity-90 disabled:opacity-50"
+                    >
+                      {gdriveSaveStatus === 'saving' ? 'Saving...' : gdriveSaveStatus === 'saved' ? 'Saved!' : 'Save Drive Link'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* Content Modification Guide Section */}
+                <div className="bg-surface-container-lowest border border-outline-variant p-8">
+                  <h3 className="text-[14px] font-bold tracking-[0.2em] uppercase text-on-surface-variant mb-6 border-b border-outline-variant pb-4">
+                    Content Modification Guide
+                  </h3>
+
+                  <div className="space-y-8 max-w-4xl text-sm leading-relaxed text-on-surface-variant">
+                    {/* Part 1 */}
+                    <div className="border-l-2 border-primary pl-4">
+                      <h4 className="text-[11px] font-bold tracking-widest uppercase text-primary mb-2 flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[16px]">cloud_upload</span>
+                        1. Uploading & Using Images
+                      </h4>
+                      <ol className="list-decimal list-inside space-y-2 text-xs">
+                        <li>
+                          Open the configured <strong>Google Drive Folder</strong> using the link above and upload your images.
+                        </li>
+                        <li>
+                          Right-click the uploaded image in Google Drive, select <strong>Share</strong> &gt; <strong>Share</strong>.
+                        </li>
+                        <li>
+                          Under General Access, change "Restricted" to <strong>"Anyone with the link"</strong>, and make sure the role is set to <strong>Viewer</strong>.
+                        </li>
+                        <li>
+                          Click <strong>Copy link</strong> and click Done.
+                        </li>
+                        <li>
+                          Go to either the <strong>Home Page</strong> or <strong>Projects Page</strong> tab, paste the copied link into the desired image slot URL field, and click <strong>Save</strong>/<strong>Add</strong>.
+                        </li>
+                        <li>
+                          <span className="text-primary font-semibold">Note:</span> The system automatically detects and converts standard Google Drive (and Dropbox) share links into direct embeddable links so they load instantly on the main website.
+                        </li>
+                      </ol>
+                    </div>
+
+                    {/* Part 2 */}
+                    <div className="border-l-2 border-primary/60 pl-4">
+                      <h4 className="text-[11px] font-bold tracking-widest uppercase text-primary/80 mb-2 flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[16px]">edit_note</span>
+                        2. How to Edit Website Content
+                      </h4>
+                      <ul className="list-disc list-inside space-y-2 text-xs">
+                        <li>
+                          <strong>Home Page Tab:</strong> Replaces the Slideshow hero images, and sets the specific grid slots for "Interiors" and "Exteriors". Also lets you modify the Canva links for interior and exterior presentations.
+                        </li>
+                        <li>
+                          <strong>Projects Page Tab:</strong> Create new residential/commercial projects or update existing ones. You can toggle visibility of default hardcoded projects, or add image URLs directly to the global gallery collage.
+                        </li>
+                        <li>
+                          <strong>Policy & Contact Tab:</strong> Update office addresses, email, and phone contact details. You can also customize the accordion headers, icons, and text content for company policies.
+                        </li>
+                      </ul>
+                    </div>
+
+                    {/* Part 3 */}
+                    <div className="border-l-2 border-primary/30 pl-4">
+                      <h4 className="text-[11px] font-bold tracking-widest uppercase text-primary/60 mb-2 flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[16px]">text_fields</span>
+                        3. Text Formatting (Policy Page)
+                      </h4>
+                      <p className="text-xs">
+                        When editing the Policy content blocks, write clean, plain text. The system will automatically convert your text paragraphs into properly formatted blocks:
+                      </p>
+                      <ul className="list-disc list-inside mt-2 space-y-1 text-[11px] font-mono pl-4">
+                        <li>Separate distinct paragraphs with a blank line.</li>
+                        <li>To create a line break, hit Enter once.</li>
+                        <li>Do not write raw HTML elements (like &lt;p&gt; or &lt;br&gt;) as they will be automatically filtered out.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             )}
           </div>
