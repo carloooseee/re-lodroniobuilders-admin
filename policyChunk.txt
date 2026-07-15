@@ -1,0 +1,164 @@
+{currentTab === 'messages' ? 'Inbox' : 'Settings'}</p>
+          </div>
+        </div>
+        <nav className="flex items-center gap-12">
+          <div className="flex gap-8 text-[11px] font-semibold tracking-widest uppercase">
+            <button
+              onClick={() => setCurrentTab('messages')}
+              className={`pb-1 transition-colors ${currentTab === 'messages'
+                ? 'text-primary border-b border-primary'
+                : 'text-on-surface-variant hover:text-primary'
+                }`}
+            >Messages</button>
+            <button
+              onClick={() => setCurrentTab('settings')}
+              className={`pb-1 transition-colors ${currentTab === 'settings'
+                ? 'text-primary border-b border-primary'
+                : 'text-on-surface-variant hover:text-primary'
+                }`}
+            >Settings</button>
+            {userData?.role === 'admin' && (
+              <button
+                onClick={() => setCurrentTab('members')}
+                className={`pb-1 transition-colors ${currentTab === 'members'
+                  ? 'text-primary border-b border-primary'
+                  : 'text-on-surface-variant hover:text-primary'
+                  }`}
+              >Members</button>
+            )}
+          </div>
+          <div className="flex items-center gap-6 border-l border-outline-variant pl-8">
+            <div className="text-right">
+              <p className="text-[11px] font-bold">{userData ? `${userData.firstName} ${userData.lastName}` : 'Admin User'}</p>
+              <p className="text-[9px] text-on-surface-variant tracking-widest uppercase">{userData ? userData.role : 'Administrator'}</p>
+            </div>
+            <div className="w-10 h-10 bg-surface-container-high rounded-full flex items-center justify-center text-xs font-bold">
+              {userData ? `${userData.firstName.charAt(0)}${userData.lastName.charAt(0)}`.toUpperCase() : 'AU'}
+            </div>
+            <button onClick={handleSignOut} className="flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase ml-4 hover:text-on-surface-variant transition-colors">
+              <span className="material-symbols-outlined text-[16px]">logout</span>
+              Sign Out
+            </button>
+          </div>
+        </nav>
+      </header>
+
+      <main className="flex-grow px-12 pt-12 pb-24">
+        {currentTab === 'settings' && (
+          <div>
+            {/* Settings Hero */}
+            <div className="mb-16 flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
+              <div className="max-w-2xl">
+                <p className="text-[11px] tracking-[0.3em] text-on-surface-variant uppercase mb-4">(Settings)</p>
+                <h2 className="text-7xl serif-title leading-tight">Home Page<br /><span className="italic">Images.</span></h2>
+                <p className="mt-8 text-sm text-on-surface-variant leading-relaxed">
+                  Paste a publicly accessible image URL for each slot. Changes are reflected immediately on the live website. You can use any image host (e.g. Imgur, Cloudinary, Google Drive public link).
+                </p>
+              </div>
+
+              <div className="bg-surface-container border border-outline-variant p-6 max-w-sm w-full flex flex-col gap-4">
+                <div className="flex items-start gap-3 text-primary">
+                  <span className="material-symbols-outlined text-2xl mt-0.5 text-blue-500">folder_shared</span>
+                  <div>
+                    <h4 className="font-serif text-lg leading-tight">Drive Image Folder</h4>
+                    <p className="text-xs text-on-surface-variant mt-1.5 leading-relaxed">
+                      Upload your image files to this folder, copy their share link, and paste them into the slots below.
+                    </p>
+                  </div>
+                </div>
+                <a
+                  href="https://drive.google.com/drive/folders/164cL3RHsVZuxvzVrKG32uTlNyRnUPItm?usp=sharing"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 text-[11px] font-bold tracking-widest uppercase transition-colors flex items-center justify-center gap-2"
+                >
+                  <span className="material-symbols-outlined text-[16px]">open_in_new</span>
+                  Open Upload Folder
+                </a>
+              </div>
+            </div>
+            <hr className="border-outline-variant mb-12" />
+
+            {/* Group slots by section */}
+            {['Hero Slideshow', 'Interiors', 'Exteriors'].map(section => (
+              <div key={section} className="mb-16">
+                <h3 className="text-[11px] font-bold tracking-[0.3em] uppercase text-on-surface-variant mb-8 border-b border-outline-variant pb-4">
+                  {section}
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  {IMAGE_SLOTS.filter(s => s.section === section).map(slot => {
+                    const currentUrl = homeImages[slot.key];
+                    const draftUrl = urlInputs[slot.key] ?? currentUrl ?? '';
+                    const status = saveStatus[slot.key]; // 'saving' | 'saved' | 'error' | null
+                    return (
+                      <div key={slot.key} className="flex flex-col gap-3">
+                        {/* Image Preview */}
+                        <div
+                          className="relative w-full aspect-[4/3] bg-surface-container border border-outline-variant overflow-hidden"
+                          style={{ background: '#1a1a1a' }}
+                        >
+                          {currentUrl ? (
+                            <img
+                              src={currentUrl}
+                              alt={slot.label}
+                              className="w-full h-full object-cover"
+                              onError={e => { e.target.style.display = 'none'; }}
+                            />
+                          ) : (
+                            <div className="w-full h-full flex flex-col items-center justify-center text-on-surface-variant gap-2">
+                              <span className="material-symbols-outlined text-3xl opacity-30">image</span>
+                              <p className="text-[9px] tracking-widest uppercase opacity-40">No image set</p>
+                            </div>
+                          )}
+                          {/* Saved overlay flash */}
+                          {status === 'saved' && (
+                            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                              <span className="material-symbols-outlined text-green-400 text-4xl">check_circle</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Slot label */}
+                        <p className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">{slot.label}</p>
+
+                        {/* URL input */}
+                        <input
+                          type="url"
+                          placeholder="Paste image URL or Google Drive share link..."
+                          value={draftUrl}
+                          onChange={e => setUrlInputs(prev => ({ ...prev, [slot.key]: e.target.value }))}
+                          className="w-full border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none focus:border-primary transition-colors font-mono"
+                        />
+                        <p className="text-[9px] text-on-surface-variant opacity-60 leading-relaxed -mt-1">
+                          Google Drive &amp; Dropbox share links are auto-converted.
+                        </p>
+
+                        {/* Action buttons */}
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleSaveUrl(slot.key)}
+                            disabled={status === 'saving' || draftUrl === (homeImages[slot.key] ?? '')}
+                            className="flex-grow border border-outline-variant bg-surface py-2.5 text-[9px] font-bold tracking-widest uppercase hover:border-primary hover:text-primary transition-colors disabled:opacity-40 flex items-center justify-center gap-2"
+                          >
+                            <span className="material-symbols-outlined text-[14px]">
+                              {status === 'saving' ? 'sync' : status === 'saved' ? 'check' : status === 'error' ? 'error' : 'save'}
+                            </span>
+                            {status === 'saving' ? 'Saving...' : status === 'saved' ? 'Saved!' : status === 'error' ? 'Error' : 'Save'}
+                          </button>
+
+                          {currentUrl && (
+                            <button
+                              onClick={() => handleRemoveUrl(slot.key)}
+                              disabled={status === 'saving'}
+                              className="border border-outline-variant bg-surface px-3 py-2.5 text-[9px] font-bold tracking-widest uppercase hover:border-red-500 hover:text-red-500 transition-colors disabled:opacity-40 flex items-center justify-center gap-1.5"
+                              title="Remove custom image and restore default"
+                            >
+                              <span className="material-symbols-outlined text-[14px]">delete</span>
+                              Remove
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                

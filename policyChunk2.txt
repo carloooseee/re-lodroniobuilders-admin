@@ -1,0 +1,161 @@
+{/* Text Content Sections */}
+            <hr className="border-outline-variant mb-12" />
+            <div className="mb-16">
+              <h2 className="text-5xl serif-title leading-tight mb-8">Text Content</h2>
+
+              {/* Contact Page Text */}
+              <div className="mb-12 bg-surface-container-lowest border border-outline-variant p-8">
+                <h3 className="text-[14px] font-bold tracking-[0.2em] uppercase text-on-surface-variant mb-6 border-b border-outline-variant pb-4">Contact Page</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">Intro Description</label>
+                    <textarea
+                      value={contactInputs.introDesc || ''}
+                      onChange={e => setContactInputs(prev => ({ ...prev, introDesc: e.target.value }))}
+                      className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none focus:border-primary transition-colors min-h-[80px]"
+                      placeholder="Reach out directly for estimates..."
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">Company Info (Title | Subtitle)</label>
+                    <input type="text" value={contactInputs.companyName || ''} onChange={e => setContactInputs(prev => ({ ...prev, companyName: e.target.value }))} className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none mb-2" placeholder="Company Name" />
+                    <input type="text" value={contactInputs.companySubtitle || ''} onChange={e => setContactInputs(prev => ({ ...prev, companySubtitle: e.target.value }))} className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none" placeholder="Company Subtitle" />
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">Contact Person (Name | Role)</label>
+                    <input type="text" value={contactInputs.contactPersonName || ''} onChange={e => setContactInputs(prev => ({ ...prev, contactPersonName: e.target.value }))} className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none mb-2" placeholder="Person Name" />
+                    <input type="text" value={contactInputs.contactPersonRole || ''} onChange={e => setContactInputs(prev => ({ ...prev, contactPersonRole: e.target.value }))} className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none" placeholder="Person Role" />
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">Office Address</label>
+                    <input type="text" value={contactInputs.addressLine1 || ''} onChange={e => setContactInputs(prev => ({ ...prev, addressLine1: e.target.value }))} className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none mb-2" placeholder="Address Line 1" />
+                    <input type="text" value={contactInputs.addressLine2 || ''} onChange={e => setContactInputs(prev => ({ ...prev, addressLine2: e.target.value }))} className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none" placeholder="Address Line 2" />
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">Emails (Comma separated)</label>
+                    <input type="text" value={contactInputs.emails || ''} onChange={e => setContactInputs(prev => ({ ...prev, emails: e.target.value }))} className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none" placeholder="email1@test.com, email2@test.com" />
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">Phones (Comma separated)</label>
+                    <input type="text" value={contactInputs.phones || ''} onChange={e => setContactInputs(prev => ({ ...prev, phones: e.target.value }))} className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none" placeholder="Phone 1, Phone 2" />
+                  </div>
+                </div>
+
+                <div className="mt-6 flex justify-end">
+                  <button onClick={handleSaveContact} disabled={contactSaveStatus === 'saving'} className="bg-primary text-white py-2 px-6 text-[10px] font-bold tracking-widest uppercase hover:bg-opacity-90 disabled:opacity-50">
+                    {contactSaveStatus === 'saving' ? 'Saving...' : contactSaveStatus === 'saved' ? 'Saved!' : 'Save Contact Info'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Home Page Links */}
+              <div className="mb-12 bg-surface-container-lowest border border-outline-variant p-8">
+                <h3 className="text-[14px] font-bold tracking-[0.2em] uppercase text-on-surface-variant mb-6 border-b border-outline-variant pb-4">Home Page Links</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">Interior Designs Hyperlink</label>
+                    <input
+                      type="url"
+                      value={homeLinkInputs.interiorLink || ''}
+                      onChange={e => setHomeLinkInputs(prev => ({ ...prev, interiorLink: e.target.value }))}
+                      className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none focus:border-primary transition-colors font-mono"
+                      placeholder="https://..."
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">Exterior Designs Hyperlink</label>
+                    <input
+                      type="url"
+                      value={homeLinkInputs.exteriorLink || ''}
+                      onChange={e => setHomeLinkInputs(prev => ({ ...prev, exteriorLink: e.target.value }))}
+                      className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none focus:border-primary transition-colors font-mono"
+                      placeholder="https://..."
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-6 flex justify-end">
+                  <button onClick={handleSaveHomeLinks} disabled={homeLinkSaveStatus === 'saving'} className="bg-primary text-white py-2 px-6 text-[10px] font-bold tracking-widest uppercase hover:bg-opacity-90 disabled:opacity-50">
+                    {homeLinkSaveStatus === 'saving' ? 'Saving...' : homeLinkSaveStatus === 'saved' ? 'Saved!' : 'Save Home Links'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Policy Page Text */}
+              <div className="mb-12 bg-surface-container-lowest border border-outline-variant p-8">
+                <h3 className="text-[14px] font-bold tracking-[0.2em] uppercase text-on-surface-variant mb-6 border-b border-outline-variant pb-4">Policy Page</h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">Hero Description</label>
+                    <textarea
+                      value={policyInputs.heroDesc || ''}
+                      onChange={e => setPolicyInputs(prev => ({ ...prev, heroDesc: e.target.value }))}
+                      className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none focus:border-primary transition-colors min-h-[80px]"
+                      placeholder="These policies define..."
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-[10px] font-bold tracking-widest uppercase text-on-surface-variant">Manual Intro Description</label>
+                    <textarea
+                      value={policyInputs.manualDesc || ''}
+                      onChange={e => setPolicyInputs(prev => ({ ...prev, manualDesc: e.target.value }))}
+                      className="border border-outline-variant bg-surface px-3 py-2 text-[11px] outline-none focus:border-primary transition-colors min-h-[80px]"
+                      placeholder="Select a section below..."
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-4 flex justify-between items-center">
+                  <label className="text-[12px] font-bold tracking-widest uppercase text-on-surface-variant">Accordion Sections</label>
+                  <button onClick={handleAddPolicyAccordionItem} className="bg-surface-container-highest text-primary py-1.5 px-4 text-[9px] font-bold tracking-widest uppercase border border-outline-variant hover:border-primary">
+                    + Add Section
+                  </button>
+                </div>
+
+                <div className="flex flex-col gap-4">
+                  {(policyInputs.accordionData || []).map((item, index) => (
+                    <div key={item.id} className="border border-outline-variant p-4 bg-surface relative group">
+                      <button onClick={() => handleRemovePolicyAccordionItem(item.id)} className="absolute top-2 right-2 text-on-surface-variant hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity" title="Remove section">
+                        <span className="material-symbols-outlined text-lg">close</span>
+                      </button>
+
+                      <div className="flex gap-4 mb-3">
+                        <div className="w-1/3 flex flex-col gap-1">
+                          <label className="text-[9px] font-bold uppercase text-on-surface-variant">Title</label>
+                          <input type="text" value={item.title} onChange={e => handleUpdatePolicyAccordionItem(item.id, 'title', e.target.value)} className="border border-outline-variant bg-surface px-2 py-1.5 text-[11px] outline-none w-full" />
+                        </div>
+                        <div className="w-1/4 flex flex-col gap-1">
+                          <label className="text-[9px] font-bold uppercase text-on-surface-variant">Icon (Material Icon)</label>
+                          <input type="text" value={item.icon} onChange={e => handleUpdatePolicyAccordionItem(item.id, 'icon', e.target.value)} className="border border-outline-variant bg-surface px-2 py-1.5 text-[11px] outline-none w-full" />
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        <label className="text-[9px] font-bold uppercase text-on-surface-variant">Content ΓÇö plain text, separate paragraphs with a blank line</label>
+                        <textarea value={item.content} onChange={e => handleUpdatePolicyAccordionItem(item.id, 'content', e.target.value)} className="border border-outline-variant bg-surface px-2 py-1.5 text-[11px] outline-none w-full min-h-[100px] whitespace-pre-wrap font-mono" placeholder="Type your paragraph here.
+
+Add a blank line to start a new paragraph." />
+                      </div>
+                    </div>
+                  ))}
+                  {(!policyInputs.accordionData || policyInputs.accordionData.length === 0) && (
+                    <div className="text-center p-4 border border-outline-variant text-on-surface-variant text-sm">No sections added yet.</div>
+                  )}
+                </div>
+
+                <div className="mt-8 flex justify-end">
+                  <button onClick={handleSavePolicy} disabled={policySaveStatus === 'saving'} className="bg-primary text-white py-2 px-6 text-[10px] font-bold tracking-widest uppercase hover:bg-opacity-90 disabled:opacity-50">
+                    {policySaveStatus === 'saving' ? 'Saving...' : policySaveStatus === 'saved' ? 'Saved!' : 'Save Policy Info'}
+                  </button>
+                </div>
+              </div>
+
+            

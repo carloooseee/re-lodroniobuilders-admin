@@ -1,0 +1,241 @@
+{
+  "residential": [
+    {
+      "id": "res-4",
+      "title": "Two-storey Residence",
+      "location": "Ayala, Alabang",
+      "description": "A luxurious contemporary residence featuring clean architectural lines, expansive glass elements, and refined finishes that create a seamless blend of elegance, comfort, and modern living.",
+      "renderImage": "../assets/Residential/houserender/houserender4.png",
+      "actualImage": "../assets/Residential/houseactual/houseactual4.png",
+      "additionalImages": [
+        "../assets/Residential/extra/house4extra01.png",
+        "../assets/Residential/extra/house4extra02.png",
+        "../assets/Residential/extra/house4extra03.png",
+        "../assets/Residential/extra/house4extra04.png",
+        "../assets/Residential/extra/house4extra05.png",
+        "../assets/Residential/extra/house4extra06.png"
+      ]
+    },
+    {
+      "id": "res-3",
+      "title": "Two-storey Residence",
+      "location": "Sta. Rosa, Laguna",
+      "description": "A contemporary family home designed with refined architectural details, premium exterior finishes, and spacious interiors, creating a perfect balance of luxury, functionality, and everyday living.",
+      "renderImage": "../assets/Residential/houserender/houserender3.jpg",
+      "actualImage": "../assets/Residential/houseactual/houseactual3.jpg",
+      "additionalImages": [
+        "../assets/Residential/extra/house3extra1.png",
+        "../assets/Residential/extra/house3extra2.png",
+        "../assets/Residential/extra/house3extra3.png",
+        "../assets/Residential/extra/house3extra4.png",
+        "../assets/Residential/extra/house3extra5.png",
+        "../assets/Residential/extra/house3extra6.png",
+        "../assets/Residential/extra/house3extra7.png",
+        "../assets/Residential/extra/house3extra8.png",
+        "../assets/Residential/extra/house3extra9.png"
+      ]
+    },
+    {
+      "id": "res-1",
+      "title": "Two-Storey Apartment Building",
+      "location": "Muntinlupa City, Metro Manila",
+      "description": "A sophisticated two-story apartment designed to maximize natural light, featuring clean architectural lines, spacious balconies, and thoughtfully planned living spaces for modern urban living.",
+      "renderImage": "../assets/Residential/houserender/houserender1.png",
+      "actualImage": "../assets/Residential/houseactual/houseactual1.png",
+      "additionalImages": []
+    },
+    {
+      "id": "res-2",
+      "title": "Two-storey Residence",
+      "location": "Magallanes, Cavite",
+      "description": "A contemporary two-story residence showcasing clean architectural lines, expansive glazing, and a seamless blend of indoor and outdoor spaces, designed to deliver comfort, elegance, and timeless functionality.",
+      "renderImage": "../assets/Residential/houserender/houserender2.png",
+      "actualImage": "../assets/Residential/houseactual/houseactual2.jpg",
+      "additionalImages": [
+        "../assets/Residential/extra/house2extra1.jpg",
+        "../assets/Residential/extra/house2extra2.png"
+      ]
+    },
+    {
+      "id": "res-5",
+      "title": "Three-storey Residence",
+      "location": "Las Pinas, Metro Manila",
+      "description": "A modern three-story corner residence with wood-panel accents, dark stone cladding, planted balconies, and a rooftop deck framed by slender steel railings.",
+      "renderImage": "../assets/Residential/houserender/houserender5.png",
+      "actualImage": "../assets/Residential/houseactual/houseactual5.png",
+      "additionalImages": [
+        "../assets/Residential/extra/house5extra1.png",
+        "../assets/Residential/extra/house5extra2.png",
+        "../assets/Residential/extra/house5extra3.png",
+        "../assets/Residential/extra/house5extra4.png",
+        "../assets/Residential/extra/house5extra5.png",
+        "../assets/Residential/extra/house5extra6.png",
+        "../assets/Residential/extra/house5extra7.png",
+        "../assets/Residential/extra/house5extra8.png",
+        "../assets/Residential/extra/house5extra9.png"
+      ]
+    },
+    {
+      "id": "res-6",
+      "title": "Two-storey residence",
+      "location": "Carmona Cavite",
+      "description": "A twilight-lit modern villa with warm timber cladding, a colonnaded veranda, solar-paneled hip roof, and manicured gardens set against a wooded backdrop.",
+      "renderImage": "../assets/Residential/houserender/houserender6.png",
+      "actualImage": "../assets/Residential/houseactual/houseactual6.png",
+      "additionalImages": [
+        "../assets/Residential/extra/house6extra1.png",
+        "../assets/Residential/extra/house6extra2.png",
+        "../assets/Residential/extra/house6extra3.png"
+      ]
+    },
+    {
+      "id": "res-7",
+      "title": "Two-Storey Residence",
+      "location": "Las Pinas, Metro Manila",
+      "description": "A textured concrete facade with vertical timber slat screening, an angular covered entryway, and a cantilevered carport wide enough for two vehicles.",
+      "renderImage": "../assets/Residential/houserender/houserender7.png",
+      "actualImage": "../assets/Residential/houseactual/houseactual7.png",
+      "additionalImages": [
+        "../assets/Residential/extra/house7extra1.png",
+        "../assets/Residential/extra/house7extra2.png",
+        "../assets/Residential/extra/house7extra3.png"
+      ]
+    },
+    {
+      "id": "res-8",
+      "title": "Two-storey Residence",
+      "location": "Paranaque, Metro Manila",
+      "description": "A Mediterranean-style estate with terracotta tile roofs, exposed wood rafter tails, arched colonnades, and decorative fretwork screens surrounding a fountain courtyard.",
+      "renderImage": "../assets/Residential/houserender/Houserender8.png",
+      "actualImage": "../assets/Residential/houseactual/Houseactual8.png",
+      "additionalImages": [
+        "../assets/Residential/extra/house8extra1.png",
+        "../assets/Residential/extra/house8extra2.png",
+        "../assets/Residential/extra/house8extra3.png"
+      ]
+    },
+    {
+      "id": "res-9",
+      "title": "One-Storey Residence",
+      "location": "Tagaytay City, Cavite",
+      "description": "A single-story indoor-outdoor pavilion with floor-to-ceiling glass walls, an extended timber-lined roof overhang, and a covered patio dining area opening onto the lawn.",
+      "renderImage": "../assets/Residential/houserender/Houserender9.png",
+      "actualImage": "../assets/Residential/houseactual/Houseactual9.png",
+      "additionalImages": [
+        "../assets/Residential/extra/house9extra1.png",
+        "../assets/Residential/extra/house9extra2.png",
+        "../assets/Residential/extra/house9extra3.png"
+      ]
+    },
+    {
+      "id": "res-10",
+      "title": "Modern Residence",
+      "location": "Metro Manila",
+      "description": "An expansive residential project featuring clean lines, premium outdoor spaces, and thoughtfully designed living areas.",
+      "renderImage": "../assets/Residential/houserender/houserender10.png",
+      "actualImage": "../assets/Residential/houseactual/House10actual1.png",
+      "additionalImages": [
+        "../assets/Residential/extra/House10extra1.png"
+      ]
+    },
+    {
+      "id": "res-11",
+      "title": "Two-Storey Residence with Roof Deck",
+      "location": "Ayala, Alabang",
+      "description": "A contemporary two-storey residence featuring a spacious roof deck, seamlessly blending modern aesthetics with functional outdoor living areas.",
+      "renderImage": "../assets/Residential/houserender/houserender11.png",
+      "actualImage": "../assets/Residential/houseactual/houseactual11.png",
+      "additionalImages": [
+        "../assets/Residential/extra/house11extra1.png",
+        "../assets/Residential/extra/house11extra2.png",
+        "../assets/Residential/extra/house11extra3.png",
+        "../assets/Residential/extra/house11extra4.png",
+        "../assets/Residential/extra/house11extra5.png",
+        "../assets/Residential/extra/house11extra6.png",
+        "../assets/Residential/extra/house11extra7.png",
+        "../assets/Residential/extra/house11extra8.png"
+      ]
+    },
+    {
+      "id": "res-12",
+      "title": "Two-Storey Residence",
+      "location": "Punta Fuego, Batangas",
+      "description": "A luxurious two-storey modern residence showcasing refined architectural elements and seamlessly integrated indoor-outdoor spaces for sophisticated coastal living.",
+      "renderImage": "../assets/Residential/houserender/houserender12.png",
+      "actualImage": "../assets/Residential/houseactual/houseactual12.png",
+      "additionalImages": [
+        "../assets/Residential/extra/house12extra1.png",
+        "../assets/Residential/extra/house12extra2.png",
+        "../assets/Residential/extra/house12extra3.png",
+        "../assets/Residential/extra/house12extra4.png"
+      ]
+    },
+    {
+      "id": "res-13",
+      "title": "Three-Storey Residence",
+      "location": "Silang, Cavite",
+      "description": "A contemporary three-storey residence set amidst lush greenery, featuring expansive balconies and large windows that seamlessly blend modern design with its serene natural surroundings.",
+      "renderImage": "../assets/Residential/houserender/houserender13.png",
+      "actualImage": "../assets/Residential/houseactual/houseactual13.png",
+      "additionalImages": [
+        "../assets/Residential/extra/house13extra1.png",
+        "../assets/Residential/extra/house13extra2.png",
+        "../assets/Residential/extra/house13extra3.png"
+      ]
+    }
+  ],
+  "commercial": [
+    {
+      "id": "comm-1",
+      "title": "One-Storey Skin and Laser Center",
+      "location": "Las Piñas City",
+      "description": "A modern, state-of-the-art commercial skin and laser clinic featuring clean, minimalist architectural design and clinical workspaces optimized for client comfort.",
+      "renderImage": "../assets/Commercial/commercialrender1.png",
+      "actualImage": "../assets/Commercial/commercialactual1.png",
+      "additionalImages": [
+        "../assets/Commercial/commercial1extra1.png",
+        "../assets/Commercial/commercial1extra2.png"
+      ]
+    },
+    {
+      "id": "comm-2",
+      "title": "Four-Storey Commercial Building",
+      "location": "Las Piñas City",
+      "description": "A four-story commercial building with a dark cantilevered upper facade, ribbon windows with warm accent lighting, and a ground-floor retail storefront wrapped in glass and stone tile.",
+      "renderImage": "../assets/Commercial/commercialrender2.png",
+      "actualImage": "../assets/Commercial/commercialactual2.png",
+      "additionalImages": []
+    },
+    {
+      "id": "comm-3",
+      "title": "Two-Storey Commercial Building",
+      "location": "Las Piñas City",
+      "description": "A boxy modern townhouse duplex with vertical wood-slat and stone-panel facades, twin street-level carports, and slatted steel gates enclosing the driveway.",
+      "renderImage": "../assets/Commercial/commercialrender3.png",
+      "actualImage": "../assets/Commercial/commercialactual3.png",
+      "additionalImages": [
+        "../assets/Commercial/commercial3extra1.png"
+      ]
+    },
+    {
+      "id": "comm-4",
+      "title": "Two-Storey Commercial Building Renovation",
+      "location": "Las Piñas City",
+      "description": "A two-story commercial storefront with bold geometric mural cladding, blank signage panels above a full-glass ground floor, and a wraparound balcony with steel railings.",
+      "renderImage": "../assets/Commercial/commercialrender4.png",
+      "actualImage": "../assets/Commercial/commercialactual4.png",
+      "additionalImages": [
+        "../assets/Commercial/commercial4extra1.png"
+      ]
+    },
+    {
+      "id": "comm-5",
+      "title": "Monterey Community Market",
+      "location": "Las Piñas City",
+      "description": "A two-story corner retail building with a bold red canopy and storefront, wood-slat cladding above, and a winged metal roof overhang shading the sidewalk signage.",
+      "renderImage": "../assets/Commercial/commercialrender5.png",
+      "actualImage": "../assets/Commercial/commercialactual5.png",
+      "additionalImages": []
+    }
+  ]
+}

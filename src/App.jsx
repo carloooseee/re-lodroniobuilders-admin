@@ -4,6 +4,7 @@ import { auth, db, app } from './firebase';
 import { initializeApp, getApps } from 'firebase/app';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, sendPasswordResetEmail, getAuth } from 'firebase/auth';
 import { doc, setDoc, getDoc, collection, query, onSnapshot, orderBy, updateDoc, deleteField, deleteDoc, addDoc } from 'firebase/firestore';
+import HARDCODED_PROJECTS from './constants/projectsData.json';
 
 // ─── Paragraph helpers ───────────────────────────────────────────────────────
 // Strips <p> tags so the textarea shows clean plain text.
@@ -115,7 +116,16 @@ function App() {
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [userData, setUserData] = useState(null);
   const [authMode, setAuthMode] = useState('login'); // 'login' or 'signup'
-  const [currentTab, setCurrentTab] = useState('messages'); // 'messages' | 'settings'
+  const [currentTab, setCurrentTab] = useState('messages'); // 'messages' | 'editSite'
+
+  const [editSiteTab, setEditSiteTab] = useState('home');
+  const [projectsData, setProjectsData] = useState({ residential: [], commercial: [], gallery: [], hiddenHardcoded: [] });
+  const [projectsSaveStatus, setProjectsSaveStatus] = useState(null);
+  const [gallerySaveStatus, setGallerySaveStatus] = useState(null);
+  const [slideshowInput, setSlideshowInput] = useState('');
+  const [galleryInput, setGalleryInput] = useState('');
+  const [editingProject, setEditingProject] = useState(null);
+
   const [messages, setMessages] = useState([]);
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -196,6 +206,7 @@ function App() {
       });
       // Fetch home image URLs from Firestore
       fetchHomeImages();
+      fetchProjectsData();
       fetchTextContent();
       return () => unsubscribe();
     } else {
@@ -234,6 +245,24 @@ function App() {
       }
     } catch (err) {
       console.error('Error fetching home images:', err);
+    }
+  };
+
+
+  const fetchProjectsData = async () => {
+    try {
+      const snap = await getDoc(doc(db, 'siteSettings', 'projectsData'));
+      if (snap.exists()) {
+        const data = snap.data();
+        setProjectsData({
+          residential: data.residential || [],
+          commercial: data.commercial || [],
+          gallery: data.gallery || [],
+          hiddenHardcoded: data.hiddenHardcoded || []
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching projects data:', err);
     }
   };
 
@@ -415,6 +444,141 @@ function App() {
     } catch (err) {
       console.error('Remove error:', err);
       setSaveStatus(prev => ({ ...prev, [slotKey]: 'error' }));
+    }
+  };
+
+
+  const handleAddSlideshowImage = async (e) => {
+    e.preventDefault();
+    if (!slideshowInput.trim()) return;
+    const url = convertToDirectUrl(slideshowInput);
+    
+    setSaveStatus(prev => ({ ...prev, slideshow: 'saving' }));
+    try {
+      const newSlideshow = [...(homeImages.slideshow || []), url];
+      await setDoc(doc(db, 'siteSettings', 'homeImages'), { slideshow: newSlideshow }, { merge: true });
+      setHomeImages(prev => ({ ...prev, slideshow: newSlideshow }));
+      setSlideshowInput('');
+      setSaveStatus(prev => ({ ...prev, slideshow: 'saved' }));
+      setTimeout(() => setSaveStatus(prev => ({ ...prev, slideshow: null })), 2000);
+    } catch (err) {
+      console.error('Slideshow save error:', err);
+      setSaveStatus(prev => ({ ...prev, slideshow: 'error' }));
+    }
+  };
+
+  const handleRemoveSlideshowImage = async (index) => {
+    if (!window.confirm('Remove this slide?')) return;
+    setSaveStatus(prev => ({ ...prev, slideshow: 'saving' }));
+    try {
+      const newSlideshow = [...(homeImages.slideshow || [])];
+      newSlideshow.splice(index, 1);
+      await setDoc(doc(db, 'siteSettings', 'homeImages'), { slideshow: newSlideshow }, { merge: true });
+      setHomeImages(prev => ({ ...prev, slideshow: newSlideshow }));
+      setSaveStatus(prev => ({ ...prev, slideshow: 'saved' }));
+      setTimeout(() => setSaveStatus(prev => ({ ...prev, slideshow: null })), 2000);
+    } catch (err) {
+      console.error('Slideshow remove error:', err);
+      setSaveStatus(prev => ({ ...prev, slideshow: 'error' }));
+    }
+  };
+
+  const handleSaveProject = async (category, project) => {
+    setProjectsSaveStatus('saving');
+    try {
+      const categoryData = [...(projectsData[category] || [])];
+      const existingIdx = categoryData.findIndex(p => p.id === project.id);
+      
+      if (existingIdx >= 0) {
+        categoryData[existingIdx] = project;
+      } else {
+        project.id = category + '-' + Date.now();
+        categoryData.push(project);
+      }
+      
+      const newData = { ...projectsData, [category]: categoryData };
+      await setDoc(doc(db, 'siteSettings', 'projectsData'), newData, { merge: true });
+      setProjectsData(newData);
+      setEditingProject(null);
+      setProjectsSaveStatus('saved');
+      setTimeout(() => setProjectsSaveStatus(null), 2000);
+    } catch (err) {
+      console.error('Project save error:', err);
+      setProjectsSaveStatus('error');
+    }
+  };
+
+
+  const handleToggleHardcodedVisibility = async (projectId, isHidden) => {
+    setProjectsSaveStatus('saving');
+    try {
+      let newHidden = [...(projectsData.hiddenHardcoded || [])];
+      if (isHidden) {
+        newHidden = newHidden.filter(id => id !== projectId);
+      } else {
+        newHidden.push(projectId);
+      }
+      const newData = { ...projectsData, hiddenHardcoded: newHidden };
+      await setDoc(doc(db, 'siteSettings', 'projectsData'), newData, { merge: true });
+      setProjectsData(newData);
+      setProjectsSaveStatus('saved');
+      setTimeout(() => setProjectsSaveStatus(null), 2000);
+    } catch (err) {
+      console.error(err);
+      setProjectsSaveStatus('error');
+    }
+  };
+
+  const handleDeleteProject = async (category, projectId) => {
+    if (!window.confirm('Are you sure you want to delete this project?')) return;
+    setProjectsSaveStatus('saving');
+    try {
+      const categoryData = (projectsData[category] || []).filter(p => p.id !== projectId);
+      const newData = { ...projectsData, [category]: categoryData };
+      await setDoc(doc(db, 'siteSettings', 'projectsData'), newData, { merge: true });
+      setProjectsData(newData);
+      setProjectsSaveStatus('saved');
+      setTimeout(() => setProjectsSaveStatus(null), 2000);
+    } catch (err) {
+      console.error('Project delete error:', err);
+      setProjectsSaveStatus('error');
+    }
+  };
+
+  const handleAddGalleryImage = async (e) => {
+    e.preventDefault();
+    if (!galleryInput.trim()) return;
+    const url = convertToDirectUrl(galleryInput);
+    
+    setGallerySaveStatus('saving');
+    try {
+      const newGallery = [...(projectsData.gallery || []), url];
+      const newData = { ...projectsData, gallery: newGallery };
+      await setDoc(doc(db, 'siteSettings', 'projectsData'), newData, { merge: true });
+      setProjectsData(newData);
+      setGalleryInput('');
+      setGallerySaveStatus('saved');
+      setTimeout(() => setGallerySaveStatus(null), 2000);
+    } catch (err) {
+      console.error('Gallery add error:', err);
+      setGallerySaveStatus('error');
+    }
+  };
+
+  const handleRemoveGalleryImage = async (index) => {
+    if (!window.confirm('Remove this photo from the gallery?')) return;
+    setGallerySaveStatus('saving');
+    try {
+      const newGallery = [...(projectsData.gallery || [])];
+      newGallery.splice(index, 1);
+      const newData = { ...projectsData, gallery: newGallery };
+      await setDoc(doc(db, 'siteSettings', 'projectsData'), newData, { merge: true });
+      setProjectsData(newData);
+      setGallerySaveStatus('saved');
+      setTimeout(() => setGallerySaveStatus(null), 2000);
+    } catch (err) {
+      console.error('Gallery remove error:', err);
+      setGallerySaveStatus('error');
     }
   };
 
@@ -725,7 +889,7 @@ function App() {
           </div>
           <div>
             <h1 className="text-xl font-medium tracking-tight serif-title leading-none">RE Lodronio Builders Inc.</h1>
-            <p className="text-[10px] tracking-[0.2em] text-on-surface-variant mt-1 uppercase">Admin • {currentTab === 'messages' ? 'Inbox' : 'Settings'}</p>
+            <p className="text-[10px] tracking-[0.2em] text-on-surface-variant mt-1 uppercase">Admin • {currentTab === 'messages' ? 'Inbox' : currentTab === 'editSite' ? 'Edit Site' : 'Members'}</p>
           </div>
         </div>
         <nav className="flex items-center gap-12">
@@ -738,12 +902,12 @@ function App() {
                 }`}
             >Messages</button>
             <button
-              onClick={() => setCurrentTab('settings')}
-              className={`pb-1 transition-colors ${currentTab === 'settings'
+              onClick={() => setCurrentTab('editSite')}
+              className={`pb-1 transition-colors ${currentTab === 'editSite'
                 ? 'text-primary border-b border-primary'
                 : 'text-on-surface-variant hover:text-primary'
                 }`}
-            >Settings</button>
+            >Edit Site</button>
             {userData?.role === 'admin' && (
               <button
                 onClick={() => setCurrentTab('members')}
@@ -771,43 +935,88 @@ function App() {
       </header>
 
       <main className="flex-grow px-12 pt-12 pb-24">
-        {currentTab === 'settings' && (
+        
+        {currentTab === 'editSite' && (
           <div>
-            {/* Settings Hero */}
-            <div className="mb-16 flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
-              <div className="max-w-2xl">
-                <p className="text-[11px] tracking-[0.3em] text-on-surface-variant uppercase mb-4">(Settings)</p>
-                <h2 className="text-7xl serif-title leading-tight">Home Page<br /><span className="italic">Images.</span></h2>
-                <p className="mt-8 text-sm text-on-surface-variant leading-relaxed">
-                  Paste a publicly accessible image URL for each slot. Changes are reflected immediately on the live website. You can use any image host (e.g. Imgur, Cloudinary, Google Drive public link).
-                </p>
-              </div>
-
-              <div className="bg-surface-container border border-outline-variant p-6 max-w-sm w-full flex flex-col gap-4">
-                <div className="flex items-start gap-3 text-primary">
-                  <span className="material-symbols-outlined text-2xl mt-0.5 text-blue-500">folder_shared</span>
-                  <div>
-                    <h4 className="font-serif text-lg leading-tight">Drive Image Folder</h4>
-                    <p className="text-xs text-on-surface-variant mt-1.5 leading-relaxed">
-                      Upload your image files to this folder, copy their share link, and paste them into the slots below.
-                    </p>
-                  </div>
-                </div>
-                <a
-                  href="https://drive.google.com/drive/folders/164cL3RHsVZuxvzVrKG32uTlNyRnUPItm?usp=sharing"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 text-[11px] font-bold tracking-widest uppercase transition-colors flex items-center justify-center gap-2"
-                >
-                  <span className="material-symbols-outlined text-[16px]">open_in_new</span>
-                  Open Upload Folder
-                </a>
+            {/* Edit Site Header */}
+            <div className="mb-12 flex justify-between items-end">
+              <div>
+                <p className="text-[11px] tracking-[0.3em] text-on-surface-variant uppercase mb-4">(Edit Site)</p>
+                <h2 className="text-7xl serif-title leading-tight">Content<br /><span className="italic">management.</span></h2>
               </div>
             </div>
-            <hr className="border-outline-variant mb-12" />
+
+            {/* Sub Tabs */}
+            <div className="flex gap-4 mb-12 border-b border-outline-variant pb-4">
+              <button
+                onClick={() => setEditSiteTab('home')}
+                className={`font-label-caps text-label-caps uppercase tracking-widest px-6 py-3 border transition-all duration-300 ${
+                  editSiteTab === 'home'
+                    ? 'bg-primary text-on-primary border-primary font-semibold'
+                    : 'bg-transparent text-on-surface-variant border-outline-variant/30 hover:border-primary/50'
+                }`}
+              >
+                Home Page
+              </button>
+              <button
+                onClick={() => setEditSiteTab('projects')}
+                className={`font-label-caps text-label-caps uppercase tracking-widest px-6 py-3 border transition-all duration-300 ${
+                  editSiteTab === 'projects'
+                    ? 'bg-primary text-on-primary border-primary font-semibold'
+                    : 'bg-transparent text-on-surface-variant border-outline-variant/30 hover:border-primary/50'
+                }`}
+              >
+                Projects Page
+              </button>
+              <button
+                onClick={() => setEditSiteTab('policy')}
+                className={`font-label-caps text-label-caps uppercase tracking-widest px-6 py-3 border transition-all duration-300 ${
+                  editSiteTab === 'policy'
+                    ? 'bg-primary text-on-primary border-primary font-semibold'
+                    : 'bg-transparent text-on-surface-variant border-outline-variant/30 hover:border-primary/50'
+                }`}
+              >
+                Policy & Contact
+              </button>
+            </div>
+
+            {/* Sub Tab Content */}
+            {editSiteTab === 'home' && (
+              <div>
+                
 
             {/* Group slots by section */}
-            {['Hero Slideshow', 'Interiors', 'Exteriors'].map(section => (
+            
+            {/* Dynamic Slideshow Section */}
+            <div className="mb-16">
+              <h3 className="text-[11px] font-bold tracking-[0.3em] uppercase text-on-surface-variant mb-8 border-b border-outline-variant pb-4">
+                Hero Slideshow
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+                {(homeImages.slideshow || []).map((url, index) => (
+                  <div key={index} className="relative group aspect-[4/3] bg-surface-container border border-outline-variant">
+                    <img src={url} className="w-full h-full object-cover" />
+                    <button onClick={() => handleRemoveSlideshowImage(index)} className="absolute top-2 right-2 bg-red-600 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-sm">
+                      <span className="material-symbols-outlined text-[16px]">delete</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <form onSubmit={handleAddSlideshowImage} className="flex gap-4">
+                <input 
+                  type="url" 
+                  required
+                  value={slideshowInput} 
+                  onChange={e => setSlideshowInput(e.target.value)} 
+                  placeholder="Paste new image URL..." 
+                  className="flex-grow border border-outline-variant bg-surface px-4 py-3 text-[11px] outline-none focus:border-primary font-mono"
+                />
+                <button type="submit" disabled={saveStatus.slideshow === 'saving'} className="bg-primary text-white px-6 font-bold tracking-widest uppercase text-[10px]">
+                  {saveStatus.slideshow === 'saving' ? 'Adding...' : 'Add Slide'}
+                </button>
+              </form>
+            </div>
+\n            {['Interiors', 'Exteriors'].map(section => (
               <div key={section} className="mb-16">
                 <h3 className="text-[11px] font-bold tracking-[0.3em] uppercase text-on-surface-variant mb-8 border-b border-outline-variant pb-4">
                   {section}
@@ -892,7 +1101,162 @@ function App() {
               </div>
             ))}
 
-            {/* Text Content Sections */}
+            
+              </div>
+            )}
+            
+            {editSiteTab === 'projects' && (
+              <div>
+                <div className="mb-16 flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8">
+                  <div className="max-w-2xl">
+                    <h2 className="text-7xl serif-title leading-tight">Projects<br /><span className="italic">Data.</span></h2>
+                    <p className="mt-8 text-sm text-on-surface-variant leading-relaxed">
+                      Manage residential and commercial projects for the slideshow, and upload photos to the gallery collage.
+                    </p>
+                  </div>
+                </div>
+                <hr className="border-outline-variant mb-12" />
+
+                {/* Edit Modal */}
+                {editingProject && (
+                  <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 overflow-y-auto">
+                    <div className="bg-surface w-full max-w-4xl p-8 rounded-sm">
+                      <div className="flex justify-between items-center mb-6">
+                        <h3 className="font-serif text-2xl">{editingProject.id ? 'Edit Project' : 'New Project'}</h3>
+                        <button onClick={() => setEditingProject(null)} className="material-symbols-outlined hover:text-primary">close</button>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="flex flex-col gap-2">
+                          <label className="text-[10px] font-bold uppercase text-on-surface-variant">Title</label>
+                          <input type="text" value={editingProject.title} onChange={e => setEditingProject({...editingProject, title: e.target.value})} className="border border-outline-variant bg-surface px-3 py-2 text-sm outline-none focus:border-primary" />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <label className="text-[10px] font-bold uppercase text-on-surface-variant">Location</label>
+                          <input type="text" value={editingProject.location} onChange={e => setEditingProject({...editingProject, location: e.target.value})} className="border border-outline-variant bg-surface px-3 py-2 text-sm outline-none focus:border-primary" />
+                        </div>
+                        <div className="flex flex-col gap-2 md:col-span-2">
+                          <label className="text-[10px] font-bold uppercase text-on-surface-variant">Description</label>
+                          <textarea value={editingProject.description} onChange={e => setEditingProject({...editingProject, description: e.target.value})} className="border border-outline-variant bg-surface px-3 py-2 text-sm outline-none focus:border-primary min-h-[100px]" />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <label className="text-[10px] font-bold uppercase text-on-surface-variant">Render Image URL</label>
+                          <input type="text" value={editingProject.renderImage} onChange={e => setEditingProject({...editingProject, renderImage: e.target.value})} className="border border-outline-variant bg-surface px-3 py-2 text-sm outline-none focus:border-primary" />
+                          {editingProject.renderImage && <img src={editingProject.renderImage} className="h-32 object-cover border border-outline-variant mt-2" />}
+                        </div>
+                        <div className="flex flex-col gap-2">
+                          <label className="text-[10px] font-bold uppercase text-on-surface-variant">Actual Image URL</label>
+                          <input type="text" value={editingProject.actualImage} onChange={e => setEditingProject({...editingProject, actualImage: e.target.value})} className="border border-outline-variant bg-surface px-3 py-2 text-sm outline-none focus:border-primary" />
+                          {editingProject.actualImage && <img src={editingProject.actualImage} className="h-32 object-cover border border-outline-variant mt-2" />}
+                        </div>
+                        
+                        <div className="flex flex-col gap-2 md:col-span-2">
+                          <label className="text-[10px] font-bold uppercase text-on-surface-variant">Additional Images (Comma separated URLs)</label>
+                          <textarea value={editingProject.additionalImages.join(', ')} onChange={e => setEditingProject({...editingProject, additionalImages: e.target.value.split(',').map(s=>s.trim()).filter(Boolean)})} className="border border-outline-variant bg-surface px-3 py-2 text-sm outline-none focus:border-primary min-h-[100px] font-mono" />
+                        </div>
+                      </div>
+
+                      <div className="mt-8 flex justify-end gap-4">
+                        <button onClick={() => setEditingProject(null)} className="px-6 py-2 border border-outline-variant hover:text-primary hover:border-primary font-bold uppercase text-[10px] tracking-widest">Cancel</button>
+                        <button onClick={() => handleSaveProject(editingProject.category, editingProject)} className="px-6 py-2 bg-primary text-white font-bold uppercase text-[10px] tracking-widest">Save Project</button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Categories */}
+                {['residential', 'commercial'].map((category) => (
+                  <div key={category} className="mb-16">
+                    <div className="flex justify-between items-center mb-6 border-b border-outline-variant pb-4">
+                      <h3 className="text-[14px] font-bold tracking-[0.2em] uppercase text-on-surface-variant capitalize">{category} Projects</h3>
+                      <button onClick={() => setEditingProject({ category, title: '', location: '', description: '', renderImage: '', actualImage: '', additionalImages: [] })} className="bg-surface-container-highest text-primary py-1.5 px-4 text-[9px] font-bold tracking-widest uppercase border border-outline-variant hover:border-primary">
+                        + Add Project
+                      </button>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+                      {(() => {
+                        const hardcoded = (HARDCODED_PROJECTS[category] || []).map(p => ({
+                          ...p,
+                          isHardcoded: true,
+                          isHidden: projectsData.hiddenHardcoded?.includes(p.id)
+                        }));
+                        const combined = [...hardcoded, ...(projectsData[category] || [])];
+                        return combined;
+                      })().map((project) => (
+                        <div key={project.id} className={`border border-outline-variant bg-surface-container-lowest p-4 relative group flex flex-col ${project.isHidden ? 'opacity-40 grayscale' : ''}`}>
+                          {project.isHardcoded ? (
+                            <button onClick={() => handleToggleHardcodedVisibility(project.id, project.isHidden)} className={`absolute top-2 right-2 text-white p-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-10 rounded-sm ${project.isHidden ? 'bg-green-600' : 'bg-gray-600'}`} title={project.isHidden ? "Show Project" : "Hide Project"}>
+                              <span className="material-symbols-outlined text-[14px]">{project.isHidden ? 'visibility' : 'visibility_off'}</span>
+                            </button>
+                          ) : (
+                            <button onClick={() => handleDeleteProject(category, project.id)} className="absolute top-2 right-2 bg-red-600 text-white p-1.5 opacity-0 group-hover:opacity-100 transition-opacity z-10 rounded-sm" title="Delete Project">
+                              <span className="material-symbols-outlined text-[14px]">delete</span>
+                            </button>
+                          )}
+                          
+                          <div className="aspect-video bg-surface-container mb-4 overflow-hidden">
+                            {(project.actualImage || project.renderImage) ? (
+                              <img src={project.actualImage || project.renderImage} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-on-surface-variant/50"><span className="material-symbols-outlined">image</span></div>
+                            )}
+                          </div>
+                          
+                          <h4 className="font-bold text-sm truncate">{project.title}</h4>
+                          <p className="text-[10px] text-on-surface-variant mb-2 truncate">{project.location}</p>
+                          <p className="text-xs line-clamp-2 text-on-surface-variant mb-4 flex-grow">{project.description}</p>
+                          
+                          {project.isHardcoded ? (
+                            <div className="w-full py-2 border border-outline-variant text-[10px] font-bold uppercase tracking-widest text-center text-on-surface-variant/50">
+                              Hardcoded Project
+                            </div>
+                          ) : (
+                            <button onClick={() => setEditingProject(project)} className="w-full py-2 border border-outline-variant hover:border-primary hover:text-primary text-[10px] font-bold uppercase tracking-widest transition-colors">
+                              Edit Project
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+                
+                <hr className="border-outline-variant mb-12" />
+                
+                {/* Global Gallery Collage */}
+                <div className="mb-16">
+                  <h3 className="text-[14px] font-bold tracking-[0.2em] uppercase text-on-surface-variant mb-6 border-b border-outline-variant pb-4 capitalize">Global Project Gallery Collage</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+                    {(projectsData.gallery || []).map((url, idx) => (
+                      <div key={idx} className="relative group aspect-[4/3] bg-surface-container border border-outline-variant">
+                        <img src={url} className="w-full h-full object-cover" />
+                        <button onClick={() => handleRemoveGalleryImage(idx)} className="absolute top-2 right-2 bg-red-600 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-sm">
+                          <span className="material-symbols-outlined text-[16px]">delete</span>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <form onSubmit={handleAddGalleryImage} className="flex gap-4">
+                    <input 
+                      type="url" 
+                      required
+                      value={galleryInput} 
+                      onChange={e => setGalleryInput(e.target.value)} 
+                      placeholder="Paste new image URL..." 
+                      className="flex-grow border border-outline-variant bg-surface px-4 py-3 text-[11px] outline-none focus:border-primary font-mono"
+                    />
+                    <button type="submit" disabled={gallerySaveStatus === 'saving'} className="bg-primary text-white px-6 font-bold tracking-widest uppercase text-[10px]">
+                      {gallerySaveStatus === 'saving' ? 'Adding...' : 'Add Image'}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            )}
+            
+            {editSiteTab === 'policy' && (
+              <div>
+                {/* Text Content Sections */}
             <hr className="border-outline-variant mb-12" />
             <div className="mb-16">
               <h2 className="text-5xl serif-title leading-tight mb-8">Text Content</h2>
@@ -1033,7 +1397,7 @@ function App() {
                         </div>
                       </div>
                       <div className="flex flex-col gap-1">
-                        <label className="text-[9px] font-bold uppercase text-on-surface-variant">Content — plain text, separate paragraphs with a blank line</label>
+                        <label className="text-[9px] font-bold uppercase text-on-surface-variant">Content ΓÇö plain text, separate paragraphs with a blank line</label>
                         <textarea value={item.content} onChange={e => handleUpdatePolicyAccordionItem(item.id, 'content', e.target.value)} className="border border-outline-variant bg-surface px-2 py-1.5 text-[11px] outline-none w-full min-h-[100px] whitespace-pre-wrap font-mono" placeholder="Type your paragraph here.
 
 Add a blank line to start a new paragraph." />
@@ -1053,10 +1417,13 @@ Add a blank line to start a new paragraph." />
               </div>
 
             </div>
+          
+              </div>
+            )}
           </div>
         )}
 
-        {currentTab === 'messages' && (
+{currentTab === 'messages' && (
           <div>
             {/* InboxHero */}
             <div className="mb-16">
