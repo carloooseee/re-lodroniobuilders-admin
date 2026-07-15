@@ -509,14 +509,21 @@ function App() {
   const handleSaveProject = async (category, project) => {
     setProjectsSaveStatus('saving');
     try {
+      const updatedProject = {
+        ...project,
+        renderImage: convertToDirectUrl(project.renderImage),
+        actualImage: convertToDirectUrl(project.actualImage),
+        additionalImages: (project.additionalImages || []).map(url => convertToDirectUrl(url))
+      };
+
       const categoryData = [...(projectsData[category] || [])];
       const existingIdx = categoryData.findIndex(p => p.id === project.id);
       
       if (existingIdx >= 0) {
-        categoryData[existingIdx] = project;
+        categoryData[existingIdx] = updatedProject;
       } else {
-        project.id = category + '-' + Date.now();
-        categoryData.push(project);
+        updatedProject.id = category + '-' + Date.now();
+        categoryData.push(updatedProject);
       }
       
       const newData = { ...projectsData, [category]: categoryData };
